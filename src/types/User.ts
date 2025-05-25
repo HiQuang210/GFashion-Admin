@@ -1,0 +1,21 @@
+export interface User {
+  _id: string;
+  email: string;
+  password?: string; 
+  firstName?: string;
+  lastName?: string;
+  img?: string;
+  isActive: boolean;
+  isAdmin: boolean;
+  phone?: string;
+  address?: string;
+  favorite: string[]; 
+  cart: {
+    product: string; 
+    color: string;
+    size: string;
+    quantity: number;
+  }[];
+  createdAt: string;
+  updatedAt: string;
+}

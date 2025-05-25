@@ -1,4 +1,4 @@
-// import toast from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import {
   HiOutlineHome,
   HiOutlineUser,
@@ -11,6 +11,11 @@ import {
   HiOutlineArrowLeftOnRectangle,
 } from 'react-icons/hi2';
 import { IoSettingsOutline } from 'react-icons/io5';
+
+export const handleSignOut = (logout: () => void) => {
+  toast.success('Logged out successfully!');
+  logout();
+};
 
 export const menu = [
   {
@@ -81,10 +86,11 @@ export const menu = [
         label: 'settings',
       },
       {
-        isLink: true,
+        isLink: false, 
         url: '/login',
         icon: HiOutlineArrowLeftOnRectangle,
-        label: 'log out',
+        label: 'Sign Out',
+        onClick: handleSignOut, 
       },
     ],
   },

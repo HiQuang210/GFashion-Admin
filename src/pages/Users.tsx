@@ -4,7 +4,21 @@ import DataTable from '../components/DataTable';
 import { fetchUsers } from '../api/ApiCollection';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import AddData from '../components/AddData';
+import AddUserData from '../components/AddUserData';
+import { HiCheck, HiX } from 'react-icons/hi';
+
+interface User {
+  _id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  img?: string;
+  isActive: boolean;
+  phone?: string;
+  createdAt: string;
+  id?: string;
+  sequentialId?: number;
+}
 
 const Users = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -13,75 +27,79 @@ const Users = () => {
     queryFn: fetchUsers,
   });
 
+  // Process and sort user data
+  const users = React.useMemo(() => {
+    if (!data?.data) return [];
+    return data.data
+      .sort((a: User, b: User) => a._id.localeCompare(b._id))
+      .map((user: User, index: number) => ({ ...user, id: user._id, sequentialId: index + 1 }));
+  }, [data]);
+
   const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 90 },
+    { 
+      field: 'sequentialId',
+      headerName: 'ID', 
+      width: 90,
+    },
     {
       field: 'firstName',
       headerName: 'Name',
       minWidth: 220,
       flex: 1,
-      renderCell: (params) => {
-        return (
-          <div className="flex gap-3 items-center">
-            <div className="avatar">
-              <div className="w-6 xl:w-9 rounded-full">
-                <img
-                  src={params.row.img || '/Portrait_Placeholder.png'}
-                  alt="user-picture"
-                />
-              </div>
+      renderCell: ({ row }) => (
+        <div className="flex gap-3 items-center">
+          <div className="avatar">
+            <div className="w-6 xl:w-9 rounded-full">
+              <img src={row.img || '/Portrait_Placeholder.png'} alt="user" />
             </div>
-            <span className="mb-0 pb-0 leading-none">
-              {params.row.firstName} {params.row.lastName}
-            </span>
           </div>
-        );
-      },
+          <span>{row.firstName} {row.lastName}</span>
+        </div>
+      ),
     },
     {
       field: 'email',
-      type: 'string',
       headerName: 'Email',
       minWidth: 200,
       flex: 1,
     },
     {
       field: 'phone',
-      type: 'string',
       headerName: 'Phone',
       minWidth: 120,
       flex: 1,
+      renderCell: ({ value }) => <span>{value || 'N/A'}</span>,
     },
     {
       field: 'createdAt',
       headerName: 'Created At',
       minWidth: 100,
-      type: 'string',
       flex: 1,
+      renderCell: ({ value }) => <span>{new Date(value).toLocaleDateString()}</span>,
     },
     {
-      field: 'verified',
+      field: 'isActive',
       headerName: 'Status',
       width: 80,
-      type: 'boolean',
       flex: 1,
+      renderCell: ({ value }) => (
+        <div className="flex justify-center items-center">
+          {value ? (
+            <HiCheck className="text-green-500 text-xl" />
+          ) : (
+            <HiX className="text-red-500 text-xl" />
+          )}
+        </div>
+      ),
     },
   ];
 
+  // Handle toast notifications
   React.useEffect(() => {
-    if (isLoading) {
-      toast.loading('Loading...', { id: 'promiseUsers' });
-    }
-    if (isError) {
-      toast.error('Error while getting the data!', {
-        id: 'promiseUsers',
-      });
-    }
-    if (isSuccess) {
-      toast.success('Got the data successfully!', {
-        id: 'promiseUsers',
-      });
-    }
+    const toastId = 'promiseUsers';
+    if (isLoading) toast.loading('Loading...', { id: toastId });
+    else if (isError) toast.error('Error while getting the data!', { id: toastId });
+    else if (isSuccess) toast.success('Got the data successfully!', { id: toastId });
   }, [isError, isLoading, isSuccess]);
 
   return (
@@ -92,55 +110,35 @@ const Users = () => {
             <h2 className="font-bold text-2xl xl:text-4xl mt-0 pt-0 text-base-content dark:text-neutral-200">
               Users
             </h2>
-            {data && data.length > 0 && (
+            {data?.totalUser && (
               <span className="text-neutral dark:text-neutral-content font-medium text-base">
-                {data.length} Users Found
+                {data.totalUser} Users Found
               </span>
             )}
           </div>
           <button
             onClick={() => setIsOpen(true)}
-            className={`btn ${
-              isLoading ? 'btn-disabled' : 'btn-primary'
-            }`}
+            className={`btn ${isLoading ? 'btn-disabled' : 'btn-primary'}`}
           >
             Add New User +
           </button>
         </div>
-        {isLoading ? (
-          <DataTable
-            slug="users"
-            columns={columns}
-            rows={[]}
-            includeActionColumn={true}
-          />
-        ) : isSuccess ? (
-          <DataTable
-            slug="users"
-            columns={columns}
-            rows={data}
-            includeActionColumn={true}
-          />
-        ) : (
-          <>
-            <DataTable
-              slug="users"
-              columns={columns}
-              rows={[]}
-              includeActionColumn={true}
-            />
-            <div className="w-full flex justify-center">
-              Error while getting the data!
-            </div>
-          </>
+
+        <DataTable
+          slug="users"
+          columns={columns}
+          rows={isSuccess ? users : []}
+          includeActionColumn={true}
+        />
+
+        {isError && !isLoading && (
+          <div className="w-full flex justify-center text-error">
+            Error while getting the data!
+          </div>
         )}
 
         {isOpen && (
-          <AddData
-            slug={'user'}
-            isOpen={isOpen}
-            setIsOpen={setIsOpen}
-          />
+          <AddUserData isOpen={isOpen} setIsOpen={setIsOpen} />
         )}
       </div>
     </div>

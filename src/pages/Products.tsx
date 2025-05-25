@@ -4,7 +4,7 @@ import DataTable from '../components/DataTable';
 import { fetchProducts } from '../api/ApiCollection';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import AddData from '../components/AddData';
+import AddProductData from '../components/AddProductData';
 
 const Products = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -149,8 +149,7 @@ const Products = () => {
         )}
 
         {isOpen && (
-          <AddData
-            slug={'product'}
+          <AddProductData
             isOpen={isOpen}
             setIsOpen={setIsOpen}
           />

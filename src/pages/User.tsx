@@ -1,267 +1,189 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useQuery } from '@tanstack/react-query';
-import { fetchSingleUser } from '../api/ApiCollection';
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts';
+import { fetchSingleUser, updateUserByAdmin } from '../api/ApiCollection';
+import { ArrowLeft } from 'lucide-react';
 
 const User = () => {
-  const tempEntries: number[] = [1, 2, 3, 4, 5];
-  const dataLine = [
-    {
-      name: 'Jan',
-      purchased: 4000,
-      wishlisted: 2400,
-      amt: 2400,
-    },
-    {
-      name: 'Feb',
-      purchased: 3000,
-      wishlisted: 1398,
-      amt: 2210,
-    },
-    {
-      name: 'Mar',
-      purchased: 2000,
-      wishlisted: 9800,
-      amt: 2290,
-    },
-    {
-      name: 'Apr',
-      purchased: 2780,
-      wishlisted: 3908,
-      amt: 2000,
-    },
-    {
-      name: 'May',
-      purchased: 1890,
-      wishlisted: 4800,
-      amt: 2181,
-    },
-    {
-      name: 'Jun',
-      purchased: 2390,
-      wishlisted: 3800,
-      amt: 2500,
-    },
-    {
-      name: 'Jul',
-      purchased: 3490,
-      wishlisted: 4300,
-      amt: 2100,
-    },
-  ];
-
-  // const [user, setUser] = React.useState();
   const { id } = useParams();
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
-  const { isLoading, isError, data, isSuccess } = useQuery({
+  const { isLoading, isError, data, isSuccess, refetch } = useQuery({
     queryKey: ['user', id],
     queryFn: () => fetchSingleUser(id || ''),
   });
 
+  const user = data?.data;
+
+  const [formData, setFormData] = React.useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    isActive: false,
+  });
+
   React.useEffect(() => {
-    if (isLoading) {
-      toast.loading('Loading...', { id: 'promiseRead' });
-    }
-    if (isError) {
-      toast.error('Error while getting the data!', {
-        id: 'promiseRead',
+    if (isSuccess && user) {
+      setFormData({
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        isActive: user.isActive || false,
       });
     }
-    if (isSuccess) {
-      toast.success('Read the data successfully!', {
-        id: 'promiseRead',
-      });
+  }, [isSuccess, user]);
+
+  React.useEffect(() => {
+    if (isLoading) toast.loading('Loading...', { id: 'promiseRead' });
+    if (isError) toast.error('Error while getting the data!', { id: 'promiseRead' });
+    if (isSuccess) toast.success('Read the data successfully!', { id: 'promiseRead' });
+  }, [isLoading, isError, isSuccess]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      isActive: e.target.value === 'true',
+    }));
+  };
+
+  const handleSubmit = async () => {
+    const { firstName, lastName, email, phone } = formData;
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+
+    if (!firstName || !lastName || !email || !phone) {
+      return toast.error('Vui lòng điền đầy đủ thông tin!');
     }
-  }, [isError, isLoading, isSuccess]);
+
+    if (!emailRegex.test(email)) {
+      return toast.error('Email không đúng định dạng!');
+    }
+
+    try {
+      await updateUserByAdmin(id || '', formData);
+      toast.success('Cập nhật thành công!');
+      refetch();
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi cập nhật!');
+    }
+  };
+
+  const handleAvatarClick = () => {
+    toast('Tính năng upload ảnh sắp ra mắt!');
+  };
+
+  const isFormValid =
+    formData.firstName &&
+    formData.lastName &&
+    formData.email &&
+    formData.phone &&
+    /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(formData.email);
 
   return (
-    // screen
-    <div id="singleUser" className="w-full p-0 m-0">
-      {/* container */}
+    <div id="singleUser" className="w-full p-4">
+      <div className="w-full flex items-center justify-between mb-4">
+        <button onClick={() => navigate('/users')} className="btn btn-ghost text-sm gap-2">
+          <ArrowLeft size={18} />
+          Return
+        </button>
+      </div>
+
       <div className="w-full grid xl:grid-cols-2 gap-10 mt-5 xl:mt-0">
-        {/* column 1 */}
         <div className="w-full flex flex-col items-start gap-10">
-          {/* profile block */}
           <div className="w-full flex flex-col items-start gap-5">
-            {/* photo block */}
-            <div className="w-full flex items-center gap-3">
-              <div className="flex items-center gap-3 xl:gap-8 xl:mb-4">
-                <div className="avatar">
-                  {isLoading ? (
-                    <div className="w-24 xl:w-36 h-24 xl:h-36 rounded-full skeleton dark:bg-neutral"></div>
-                  ) : isSuccess ? (
-                    <div className="w-24 xl:w-36 rounded-full">
-                      <img src={data.img} alt="avatar" />
+            <div className="w-full flex items-center gap-5">
+              {isSuccess && user && (
+                <div className="avatar relative group cursor-pointer" onClick={handleAvatarClick}>
+                  <div className="w-24 xl:w-36 rounded-full overflow-hidden relative">
+                    <img
+                      src={user.img || '/Portrait_Placeholder.png'}
+                      alt="avatar"
+                      className="object-cover w-full h-full transition-opacity duration-300"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <span className="text-white text-xs">Upload Image</span>
                     </div>
-                  ) : (
-                    ''
-                  )}
+                  </div>
                 </div>
-                <div className="flex flex-col items-start gap-1">
-                  {isLoading ? (
-                    <div className="w-[200px] h-[36px] skeleton dark:bg-neutral"></div>
-                  ) : isSuccess ? (
-                    <h3 className="font-semibold text-xl xl:text-3xl dark:text-white">
-                      {data.firstName} {data.lastName}
-                    </h3>
-                  ) : (
-                    <div className="w-[200px] h-[36px] skeleton dark:bg-neutral"></div>
-                  )}
-                  <span className="font-normal text-base">
-                    Member
-                  </span>
-                </div>
+              )}
+              <div className="flex flex-col items-start gap-1">
+                <h3 className="font-semibold text-xl xl:text-3xl dark:text-white">
+                  {formData.firstName} {formData.lastName}
+                </h3>
               </div>
             </div>
-            {/* detail block */}
-            <div className="w-full flex gap-8">
-              {isLoading ? (
-                <div className="w-full xl:w-[50%} h-52 skeleton dark:bg-neutral"></div>
-              ) : isSuccess ? (
-                <div className="w-full grid grid-cols-3 xl:flex gap-5 xl:gap-8">
-                  {/* column 1 */}
-                  <div className="col-span-1 flex flex-col items-start gap-3 xl:gap-5">
-                    <span>First Name</span>
-                    <span>Last Name</span>
-                    <span>Email</span>
-                    <span>Phone</span>
-                    <span>Status</span>
-                  </div>
-                  {/* column 2 */}
-                  <div className="col-span-2 flex flex-col items-start gap-3 xl:gap-5">
-                    <span className="font-semibold">
-                      {data.firstName}
-                    </span>
-                    <span className="font-semibold">
-                      {data.lastName}
-                    </span>
-                    <span className="font-semibold">
-                      {data.email}
-                    </span>
-                    <span className="font-semibold">
-                      {data.phone}
-                    </span>
-                    <span className="font-semibold">
-                      {data.verified ? 'Verified' : 'Not Verified'}
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <div className="w-full xl:w-[50%} h-52 skeleton dark:bg-neutral"></div>
-              )}
+
+            <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-5">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium">First Name</label>
+                <input
+                  name="firstName"
+                  type="text"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  className="input input-bordered w-full"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium">Last Name</label>
+                <input
+                  name="lastName"
+                  type="text"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  className="input input-bordered w-full"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium">Email</label>
+                <input
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="input input-bordered w-full"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium">Phone</label>
+                <input
+                  name="phone"
+                  type="text"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="input input-bordered w-full"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium">Status</label>
+                <select
+                  value={formData.isActive.toString()}
+                  onChange={handleStatusChange}
+                  className="select select-bordered w-full"
+                >
+                  <option value="true">Active</option>
+                  <option value="false">Inactive</option>
+                </select>
+              </div>
             </div>
+
+            <div className="w-full h-[2px] bg-base-300 dark:bg-slate-700 mt-6"></div>
+
+            <button
+              className="btn btn-primary self-center xl:self-start"
+              disabled={!isFormValid}
+              onClick={handleSubmit}
+            >
+              Xác nhận
+            </button>
           </div>
-          {/* divider */}
-          <div className="w-full h-[2px] bg-base-300 dark:bg-slate-700"></div>
-          {/* chart */}
-          {isLoading ? (
-            <div className="w-full min-h-[300px] skeleton dark:bg-neutral"></div>
-          ) : isSuccess ? (
-            <div className="w-full min-h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={dataLine}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="purchased"
-                    stroke="#8884d8"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="wishlisted"
-                    stroke="#82ca9d"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className="w-full min-h-[300px] skeleton dark:bg-neutral"></div>
-          )}
-        </div>
-        {/* column 2 */}
-        <div
-          id="activities"
-          className="w-full flex flex-col items-start gap-5"
-        >
-          <h2 className="text-2xl font-semibold dark:text-white">
-            Latest Activities
-          </h2>
-          {isLoading &&
-            tempEntries.map((index: number) => (
-              <div
-                className="w-full h-20 skeleton dark:bg-neutral"
-                key={index}
-              ></div>
-            ))}
-          {isSuccess && (
-            <ul>
-              <li>
-                <div className="ml-[1px] relative p-4 bg-base-200 dark:bg-neutral dark:text-neutral-50 min-w-[85vw] xl:min-w-[480px] flex flex-col items-start gap-3">
-                  <span>
-                    {data.firstName} {data.lastName} purchased
-                    Playstation 5 Digital Edition
-                  </span>
-                  <span className="text-xs">3 days ago</span>
-                </div>
-              </li>
-              <li>
-                <div className="ml-[1px] relative p-4 bg-base-200 dark:bg-neutral dark:text-neutral-50 min-w-[85vw] xl:min-w-[480px] flex flex-col items-start gap-3">
-                  <span>
-                    {data.firstName} {data.lastName} added 3 items
-                    into wishlist
-                  </span>
-                  <span className="text-xs">1 week ago</span>
-                </div>
-              </li>
-              <li>
-                <div className="ml-[1px] relative p-4 bg-base-200 dark:bg-neutral dark:text-neutral-50 min-w-[85vw] xl:min-w-[480px] flex flex-col items-start gap-3">
-                  <span>
-                    {data.firstName} {data.lastName} purchased Samsung
-                    4K UHD SmartTV
-                  </span>
-                  <span className="text-xs">2 weeks ago</span>
-                </div>
-              </li>
-              <li>
-                <div className="ml-[1px] relative p-4 bg-base-200 dark:bg-neutral dark:text-neutral-50 min-w-[85vw] xl:min-w-[480px] flex flex-col items-start gap-3">
-                  <span>
-                    {data.firstName} {data.lastName} commented a post
-                  </span>
-                  <span className="text-xs">3 weeks ago</span>
-                </div>
-              </li>
-              <li>
-                <div className="ml-[1px] relative p-4 bg-base-200 dark:bg-neutral dark:text-neutral-50 min-w-[85vw] xl:min-w-[480px] flex flex-col items-start gap-3">
-                  <span>
-                    {data.firstName} {data.lastName} added 1 item into
-                    wishlist
-                  </span>
-                  <span className="text-xs">1 month ago</span>
-                </div>
-              </li>
-            </ul>
-          )}
-          {isError &&
-            tempEntries.map((index: number) => (
-              <div
-                className="w-full h-20 skeleton dark:bg-neutral"
-                key={index}
-              ></div>
-            ))}
         </div>
       </div>
     </div>

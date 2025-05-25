@@ -1,10 +1,101 @@
-// import React from 'react';
+import { useState } from 'react';
 import ChangeThemes from '../components/ChangesThemes';
 import { DiReact } from 'react-icons/di';
 import { useNavigate } from 'react-router-dom';
+import { adminLoginUser } from '../api/ApiCollection'; 
+import { setCookie } from '../utils/cookieUltis'
 
 const Login = () => {
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [rememberMe, setRememberMe] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    if (error) setError('');
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    if (!formData.email || !formData.password) {
+      setError('Please fill in all fields');
+      return;
+    }
+
+    if (!formData.email.includes('@')) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      console.log('Attempting admin login with:', { 
+        email: formData.email.toLowerCase().trim() 
+      });
+
+      const response = await adminLoginUser({
+        email: formData.email.toLowerCase().trim(),
+        password: formData.password
+      });
+
+      console.log('Login response:', response);
+
+      if (response.status === 'OK') {
+        // Store tokens in cookies
+        const cookieDays = rememberMe ? 7 : 1; // 7 days if remember me, 1 day otherwise
+        
+        setCookie('adminToken', response.access_token, cookieDays);
+        setCookie('adminRefreshToken', response.refresh_token, cookieDays);
+        setCookie('adminUser', JSON.stringify(response.userInfo), cookieDays);
+
+        // Navigate to dashboard
+        navigate('/', { replace: true });
+      } else {
+        setError(response.message || 'Login failed'); 
+      }
+      
+    } catch (error) {
+      console.error('Login error:', error);
+
+      // Narrow error type to access properties safely
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'response' in error &&
+        typeof (error as any).response === 'object'
+      ) {
+        const errResponse = (error as any).response;
+        if (errResponse?.data?.message) {
+          setError(errResponse.data.message);
+        } else if (errResponse?.status === 403) {
+          setError('Access denied. Admin privileges required.');
+        } else if (errResponse?.status === 401) {
+          setError('Invalid email or password');
+        } else if (errResponse?.status === 404) {
+          setError('User not found');
+        } else {
+          setError('Login failed. Please check your connection and try again.');
+        }
+      } else {
+        setError('Login failed. Please check your connection and try again.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     // screen
     <div className="w-full p-0 m-0">
@@ -24,7 +115,16 @@ const Login = () => {
           <span className="xl:text-xl font-semibold">
             Hello, 👋 Welcome Back!
           </span>
-          <div className="w-full flex flex-col items-stretch gap-3">
+          
+          <form onSubmit={handleSubmit} className="w-full flex flex-col items-stretch gap-3">
+            {/* Error message */}
+            {error && (
+              <div className="alert alert-error">
+                <span className="text-sm">{error}</span>
+              </div>
+            )}
+
+            {/* Email input */}
             <label className="input input-bordered min-w-full flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -36,11 +136,18 @@ const Login = () => {
                 <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
               </svg>
               <input
-                type="text"
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
                 className="grow input outline-none focus:outline-none border-none border-[0px] h-auto pl-1 pr-0"
                 placeholder="Email"
+                required
+                disabled={isLoading}
               />
             </label>
+
+            {/* Password input */}
             <label className="input input-bordered flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -56,17 +163,25 @@ const Login = () => {
               </svg>
               <input
                 type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
                 className="grow input outline-none focus:outline-none border-none border-[0px] h-auto pl-1 pr-0"
                 placeholder="Password"
+                required
+                disabled={isLoading}
               />
             </label>
+
             <div className="flex items-center justify-between">
               <div className="form-control">
                 <label className="label cursor-pointer gap-2">
                   <input
                     type="checkbox"
-                    defaultChecked
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
                     className="checkbox w-4 h-4 rounded-md checkbox-primary"
+                    disabled={isLoading}
                   />
                   <span className="label-text text-xs">
                     Remember me
@@ -80,42 +195,22 @@ const Login = () => {
                 Forgot Password?
               </a>
             </div>
-            <div
-              onClick={() => navigate('/')}
-              className="btn btn-block btn-primary"
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`btn btn-block btn-primary ${isLoading ? 'loading' : ''}`}
             >
-              Log In
-            </div>
-            <div className="divider text-sm">OR</div>
-            <div className="w-full flex justify-center items-center gap-4">
-              <button className="btn btn-circle dark:btn-neutral">
-                <img
-                  className="w-6"
-                  src="/icons8-microsoft.svg"
-                  alt="microsoft"
-                />
-              </button>
-              <button className="btn btn-circle dark:btn-neutral">
-                <img
-                  className="w-6"
-                  src="/icons8-google.svg"
-                  alt="google"
-                />
-              </button>
-              <button className="btn btn-circle dark:btn-neutral">
-                <img
-                  className="dark:hidden w-6"
-                  src="/icons8-apple-black.svg"
-                  alt="apple"
-                />
-                <img
-                  className="hidden dark:block w-6"
-                  src="/icons8-apple-white.svg"
-                  alt="apple"
-                />
-              </button>
-            </div>
-          </div>
+              {isLoading ? (
+                <>
+                  <span className="loading loading-spinner loading-sm"></span>
+                  Logging in...
+                </>
+              ) : (
+                'Log In'
+              )}
+            </button>
+          </form>
         </div>
       </div>
     </div>

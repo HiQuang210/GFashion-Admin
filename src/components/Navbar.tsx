@@ -1,15 +1,16 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { HiBars3CenterLeft } from 'react-icons/hi2';
 import { DiReact } from 'react-icons/di';
-import { HiSearch, HiOutlineBell } from 'react-icons/hi';
+import { HiOutlineBell } from 'react-icons/hi';
 import { RxEnterFullScreen, RxExitFullScreen } from 'react-icons/rx';
 import ChangeThemes from './ChangesThemes';
 import toast from 'react-hot-toast';
 import { menu } from './menu/data';
 import MenuItem from './menu/MenuItem';
+import { useAuth } from '../hooks/useAuth';
 
-const Navbar = () => {
+const Navbar: React.FC = () => {
   const [isFullScreen, setIsFullScreen] = React.useState(true);
   const element = document.getElementById('root');
 
@@ -20,7 +21,12 @@ const Navbar = () => {
     setIsFullScreen((prev) => !prev);
   };
 
-  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    toast.success('Logged out successfully!');
+    logout(); 
+  };
 
   React.useEffect(() => {
     if (isFullScreen) {
@@ -73,7 +79,14 @@ const Navbar = () => {
                   onClick={toggleDrawer}
                   key={index}
                   catalog={item.catalog}
-                  listItems={item.listItems}
+                  listItems={
+                    item.listItems.map((listItem: any) => ({
+                      ...listItem,
+                      onClick: listItem.onClick
+                        ? () => listItem.onClick(logout)
+                        : undefined,
+                    }))
+                  }
                 />
               ))}
             </div>
@@ -91,15 +104,6 @@ const Navbar = () => {
 
       {/* navbar items to right */}
       <div className="flex items-center gap-0 xl:gap-1 2xl:gap-2 3xl:gap-5">
-        {/* search */}
-        <button
-          onClick={() =>
-            toast('Not yet implemented!')
-          }
-          className="hidden sm:inline-flex btn btn-circle btn-ghost"
-        >
-          <HiSearch className="text-xl 2xl:text-2xl 3xl:text-3xl" />
-        </button>
 
         {/* fullscreen */}
         <button
@@ -135,10 +139,10 @@ const Navbar = () => {
             role="button"
             className="btn btn-ghost btn-circle avatar"
           >
-            <div className="w-9  rounded-full">
+            <div className="w-9 rounded-full">
               <img
-                src="https://avatars.githubusercontent.com/u/74099030?v=4"
-                alt="foto-cowok-ganteng"
+                src={user?.img || '/Portrait_Placeholder.png'}
+                alt={user ? `${user.firstName} ${user.lastName}` : 'User'}
               />
             </div>
           </div>
@@ -146,13 +150,20 @@ const Navbar = () => {
             tabIndex={0}
             className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-40"
           >
+            {user && (
+              <li className="py-2 text-xs text-gray-500 border-b border-gray-200">
+                <span className="font-medium">
+                  Hi {user.firstName} {user.lastName}
+                </span>
+              </li>
+            )}
             <Link to={'/profile'}>
               <li>
                 <a className="justify-between">My Profile</a>
               </li>
             </Link>
-            <li onClick={() => navigate('/login')}>
-              <a>Log Out</a>
+            <li onClick={handleLogout}>
+              <a className="text-red-600 hover:bg-red-50">Sign Out</a>
             </li>
           </ul>
         </div>

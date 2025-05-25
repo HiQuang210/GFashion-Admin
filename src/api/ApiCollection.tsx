@@ -1,4 +1,59 @@
-import axios from 'axios';
+import axios, { AxiosResponse, AxiosError } from 'axios';
+import { getCookie, deleteCookie } from '../utils/cookieUltis';
+import { User } from '../types/User'; 
+
+const API_BASE_URL = 'http://localhost:5000/api';
+
+interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+interface LoginResponse {
+  status: string;
+  message: string;
+  access_token: string;
+  refresh_token: string;
+  userInfo: User;
+}
+
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+});
+
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = getCookie('adminToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error: AxiosError) => Promise.reject(error)
+);
+
+apiClient.interceptors.response.use(
+  (response: AxiosResponse) => response,
+  (error: AxiosError) => {
+    if (error.response?.status === 401) {
+      deleteCookie('adminToken');
+      deleteCookie('adminRefreshToken');
+      deleteCookie('adminUser');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+export const adminLoginUser = async (credentials: LoginCredentials): Promise<LoginResponse> => {
+  try {
+    const response = await axios.post<LoginResponse>(`${API_BASE_URL}/user/admin-sign-in`, credentials);
+    return response.data;
+  } catch (error) {
+    console.error('Admin login error:', error);
+    throw error;
+  }
+};
 
 // GET TOP DEALS
 export const fetchTopDeals = async () => {
@@ -19,18 +74,18 @@ export const fetchTopDeals = async () => {
 // GET TOTAL USERS
 export const fetchTotalUsers = async () => {
   const response = await axios
-    .get('https://react-admin-ui-v1-api.vercel.app/totalusers')
+    .get('http://localhost:5000/api/user/getAll')
     .then((res) => {
-      console.log('axios get:', res.data);
-      return res.data;
+      return res.data.length;
     })
     .catch((err) => {
-      console.log(err);
+      console.error('Failed to fetch total users:', err);
       throw err;
     });
 
   return response;
 };
+
 
 // GET TOTAL PRODUCTS
 export const fetchTotalProducts = async () => {
@@ -149,13 +204,13 @@ export const fetchTotalProfit = async () => {
 // GET ALL USERS
 export const fetchUsers = async () => {
   const response = await axios
-    .get('https://react-admin-ui-v1-api.vercel.app/users')
+    .get('http://localhost:5000/api/user/getAll')
     .then((res) => {
-      console.log('axios get:', res.data);
+      console.log('Fetched users:', res.data);
       return res.data;
     })
     .catch((err) => {
-      console.log(err);
+      console.error('Failed to fetch all users:', err);
       throw err;
     });
 
@@ -165,18 +220,27 @@ export const fetchUsers = async () => {
 // GET SINGLE USER
 export const fetchSingleUser = async (id: string) => {
   const response = await axios
-    .get(`https://react-admin-ui-v1-api.vercel.app/users/${id}`)
+    .get(`http://localhost:5000/api/user/get-detail/${id}`)
     .then((res) => {
-      console.log('axios get:', res.data);
+      console.log('Fetched single user:', res.data);
       return res.data;
     })
     .catch((err) => {
-      console.log(err);
+      console.error('Failed to fetch user details:', err);
       throw err;
     });
-
+   
   return response;
 };
+
+// UPDATE USER INFO
+export const updateUserByAdmin = async (id: string, updatedData: any) => {
+  const response = await axios.put(`http://localhost:5000/api/user/admin-update-user/${id}`, updatedData);
+  return response.data;
+};
+
+//UPLOAD PROFILE PICTURE
+
 
 // GET ALL PRODUCTS
 export const fetchProducts = async () => {

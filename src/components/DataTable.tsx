@@ -2,14 +2,11 @@ import React from 'react';
 import {
   DataGrid,
   GridColDef,
-  //   GridToolbarQuickFilter,
-  GridToolbar,
-  //   GridValueGetterParams,
+  GridToolbar
 } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
 import {
   HiOutlinePencilSquare,
-  HiOutlineEye,
   HiOutlineTrash,
 } from 'react-icons/hi2';
 import toast from 'react-hot-toast';
@@ -37,18 +34,9 @@ const DataTable: React.FC<DataTableProps> = ({
     renderCell: (params) => {
       return (
         <div className="flex items-center">
-          {/* <div to={`/${props.slug}/${params.row.id}`}> */}
           <button
             onClick={() => {
               navigate(`/${slug}/${params.row.id}`);
-            }}
-            className="btn btn-square btn-ghost"
-          >
-            <HiOutlineEye />
-          </button>
-          <button
-            onClick={() => {
-              toast('Not yet to be implemented');
             }}
             className="btn btn-square btn-ghost"
           >
