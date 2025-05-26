@@ -51,7 +51,7 @@ const Login = () => {
 
         setCookie('adminToken', response.access_token, cookieDays);
         setCookie('adminRefreshToken', response.refresh_token, cookieDays);
-        setCookie('adminUser', JSON.stringify(response.userInfo), cookieDays);
+        setCookie('adminUserId', response.userInfo._id, cookieDays);
 
         navigate('/', { replace: true });
       } else {

@@ -21,6 +21,6 @@ export const deleteCookie = (name: string): void => {
 
 export const isAuthenticated = (): boolean => {
   const token = getCookie('adminToken');
-  const user = getCookie('adminUser');
-  return !!(token && user);
+  const userId = getCookie('adminUserId');
+  return !!(token && userId);
 };

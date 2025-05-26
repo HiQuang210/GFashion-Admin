@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCookie, deleteCookie, isAuthenticated } from '../utils/cookieUltis';
+import { getCookie, deleteCookie } from '../utils/cookieUltis';
 import { User } from '../types/User';
+import { fetchSingleUser } from '../api/ApiCollection';
 
 interface UseAuthReturn {
   user: User | null;
@@ -20,19 +21,21 @@ export const useAuth = (): UseAuthReturn => {
     checkAuth();
   }, []);
 
-  const checkAuth = (): void => {
+  const checkAuth = async (): Promise<void> => {
+    const token = getCookie('adminToken');
+    const userId = getCookie('adminUserId');
+
+    if (!token || !userId) {
+      logout();
+      return;
+    }
+
     try {
-      if (isAuthenticated()) {
-        const userData = getCookie('adminUser');
-        if (userData) {
-          const parsedUser: User = JSON.parse(userData);
-          setUser(parsedUser);
-        }
-      } else {
-        setUser(null);
-      }
+      const response = await fetchSingleUser(userId);
+      const userData = response.data || response;
+      setUser(userData);
     } catch (error) {
-      console.error('❌ Auth check error:', error);
+      console.error('❌ Failed to fetch user from ID:', error);
       logout();
     } finally {
       setLoading(false);
@@ -42,9 +45,9 @@ export const useAuth = (): UseAuthReturn => {
   const logout = (): void => {
     deleteCookie('adminToken');
     deleteCookie('adminRefreshToken');
-    deleteCookie('adminUser');
+    deleteCookie('adminUserId');
     setUser(null);
-    navigate('/login'); 
+    navigate('/login');
   };
 
   return {
