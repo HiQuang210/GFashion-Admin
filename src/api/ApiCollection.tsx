@@ -1,6 +1,6 @@
 import axios, { AxiosResponse, AxiosError } from 'axios';
 import { getCookie, deleteCookie } from '../utils/cookieUltis';
-import { User } from '../types/User'; 
+import { CreateUserData, User } from '../types/User'; 
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
@@ -55,37 +55,62 @@ export const adminLoginUser = async (credentials: LoginCredentials): Promise<Log
   }
 };
 
-// GET TOP DEALS
-export const fetchTopDeals = async () => {
-  const response = await axios
-    .get('https://react-admin-ui-v1-api.vercel.app/topdeals')
-    .then((res) => {
-      console.log('axios get:', res.data);
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-      throw err;
-    });
-
-  return response;
+export const adminCreateUser = async (newUser: CreateUserData) => {
+  try {
+    const response = await apiClient.post('/user/sign-up', newUser);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
+  }
 };
 
-// GET TOTAL USERS
+// GET TOTAL USERS (excluding current user)
 export const fetchTotalUsers = async () => {
-  const response = await axios
-    .get('http://localhost:5000/api/user/getAll')
-    .then((res) => {
-      return res.data.length;
-    })
-    .catch((err) => {
-      console.error('Failed to fetch total users:', err);
-      throw err;
-    });
-
-  return response;
+  try {
+    const response = await apiClient.get('/user/getAll');
+    return response.data.totalUser; 
+  } catch (err) {
+    console.error('Failed to fetch total users:', err);
+    throw err;
+  }
 };
 
+// GET ALL USERS (excluding current user)
+export const fetchUsers = async () => {
+  try {
+    const response = await apiClient.get('/user/getAll');
+    console.log('Fetched users:', response.data);
+    return response.data;
+  } catch (err) {
+    console.error('Failed to fetch all users:', err);
+    throw err;
+  }
+};
+
+// GET SINGLE USER
+export const fetchSingleUser = async (id: string) => {
+  try {
+    const response = await apiClient.get(`/user/get-detail/${id}`);
+    console.log('Fetched single user:', response.data);
+    return response.data;
+  } catch (err) {
+    console.error('Failed to fetch user details:', err);
+    throw err;
+  }
+};
+
+// UPDATE USER INFO
+export const updateUserByAdmin = async (id: string, updatedData: Partial<User>) => {
+  try {
+    const response = await apiClient.put(`/user/admin-update-user/${id}`, updatedData);
+    console.log('User updated by admin:', response.data);
+    return response.data;
+  } catch (err) {
+    console.error('Failed to update user by admin:', err);
+    throw err;
+  }
+};
 
 // GET TOTAL PRODUCTS
 export const fetchTotalProducts = async () => {
@@ -167,6 +192,22 @@ export const fetchTotalVisit = async () => {
   return response;
 };
 
+// GET TOP DEALS
+export const fetchTopDeals = async () => {
+  const response = await axios
+    .get('https://react-admin-ui-v1-api.vercel.app/topdeals')
+    .then((res) => {
+      console.log('axios get:', res.data);
+      return res.data;
+    })
+    .catch((err) => {
+      console.log(err);
+      throw err;
+    });
+
+  return response;
+};
+
 // GET TOTAL REVENUE BY PRODUCTS
 export const fetchTotalRevenueByProducts = async () => {
   const response = await axios
@@ -199,44 +240,6 @@ export const fetchTotalProfit = async () => {
     });
 
   return response;
-};
-
-// GET ALL USERS
-export const fetchUsers = async () => {
-  const response = await axios
-    .get('http://localhost:5000/api/user/getAll')
-    .then((res) => {
-      console.log('Fetched users:', res.data);
-      return res.data;
-    })
-    .catch((err) => {
-      console.error('Failed to fetch all users:', err);
-      throw err;
-    });
-
-  return response;
-};
-
-// GET SINGLE USER
-export const fetchSingleUser = async (id: string) => {
-  const response = await axios
-    .get(`http://localhost:5000/api/user/get-detail/${id}`)
-    .then((res) => {
-      console.log('Fetched single user:', res.data);
-      return res.data;
-    })
-    .catch((err) => {
-      console.error('Failed to fetch user details:', err);
-      throw err;
-    });
-   
-  return response;
-};
-
-// UPDATE USER INFO
-export const updateUserByAdmin = async (id: string, updatedData: any) => {
-  const response = await axios.put(`http://localhost:5000/api/user/admin-update-user/${id}`, updatedData);
-  return response.data;
 };
 
 //UPLOAD PROFILE PICTURE

@@ -2,8 +2,8 @@ import { useState } from 'react';
 import ChangeThemes from '../components/ChangesThemes';
 import { DiReact } from 'react-icons/di';
 import { useNavigate } from 'react-router-dom';
-import { adminLoginUser } from '../api/ApiCollection'; 
-import { setCookie } from '../utils/cookieUltis'
+import { adminLoginUser } from '../api/ApiCollection';
+import { setCookie } from '../utils/cookieUltis';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!formData.email || !formData.password) {
       setError('Please fill in all fields');
       return;
@@ -41,53 +41,27 @@ const Login = () => {
     setError('');
 
     try {
-      console.log('Attempting admin login with:', { 
-        email: formData.email.toLowerCase().trim() 
-      });
-
       const response = await adminLoginUser({
         email: formData.email.toLowerCase().trim(),
         password: formData.password
       });
 
-      console.log('Login response:', response);
-
       if (response.status === 'OK') {
-        // Store tokens in cookies
-        const cookieDays = rememberMe ? 7 : 1; // 7 days if remember me, 1 day otherwise
-        
+        const cookieDays = rememberMe ? 7 : 1;
+
         setCookie('adminToken', response.access_token, cookieDays);
         setCookie('adminRefreshToken', response.refresh_token, cookieDays);
         setCookie('adminUser', JSON.stringify(response.userInfo), cookieDays);
 
-        // Navigate to dashboard
         navigate('/', { replace: true });
       } else {
-        setError(response.message || 'Login failed'); 
+        setError(response.message || 'Login failed');
       }
-      
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
 
-      // Narrow error type to access properties safely
-      if (
-        typeof error === 'object' &&
-        error !== null &&
-        'response' in error &&
-        typeof (error as any).response === 'object'
-      ) {
-        const errResponse = (error as any).response;
-        if (errResponse?.data?.message) {
-          setError(errResponse.data.message);
-        } else if (errResponse?.status === 403) {
-          setError('Access denied. Admin privileges required.');
-        } else if (errResponse?.status === 401) {
-          setError('Invalid email or password');
-        } else if (errResponse?.status === 404) {
-          setError('User not found');
-        } else {
-          setError('Login failed. Please check your connection and try again.');
-        }
+      if (error?.response?.data?.message) {
+        setError(error.response.data.message);
       } else {
         setError('Login failed. Please check your connection and try again.');
       }
@@ -97,34 +71,31 @@ const Login = () => {
   };
 
   return (
-    // screen
     <div className="w-full p-0 m-0">
-      {/* container */}
       <div className="w-full min-h-screen flex justify-center items-center bg-base-200 relative">
-        {/* theme */}
         <div className="absolute top-5 right-5 z-[99]">
           <ChangeThemes />
         </div>
-        <div className="w-full h-screen xl:h-auto xl:w-[30%] 2xl:w-[25%] 3xl:w-[20%] bg-base-100 rounded-lg shadow-md flex flex-col items-center p-5 pb-7 gap-8 pt-20 xl:pt-7">
-          <div className="flex items-center gap-1 xl:gap-2">
-            <DiReact className="text-4xl sm:text-4xl xl:text-6xl 2xl:text-6xl text-primary animate-spin-slow -ml-3" />
-            <span className="text-[18px] leading-[1.2] sm:text-lg xl:text-3xl 2xl:text-3xl font-semibold text-base-content dark:text-neutral-200">
+
+        <div className="w-full h-screen xl:h-auto xl:w-[30%] 2xl:w-[25%] 3xl:w-[20%] bg-base-100 rounded-lg shadow-md flex flex-col items-center p-5 pb-6 gap-4 pt-14 xl:pt-5">
+          <div className="flex items-center gap-2">
+            <DiReact className="text-4xl xl:text-6xl text-primary animate-spin-slow -ml-2" />
+            <span className="text-lg xl:text-3xl font-semibold text-base-content dark:text-neutral-200">
               GFashion Dashboard
             </span>
           </div>
-          <span className="xl:text-xl font-semibold">
+
+          <span className="xl:text-xl font-semibold -mt-2">
             Hello, 👋 Welcome Back!
           </span>
-          
+
           <form onSubmit={handleSubmit} className="w-full flex flex-col items-stretch gap-3">
-            {/* Error message */}
             {error && (
               <div className="alert alert-error">
                 <span className="text-sm">{error}</span>
               </div>
             )}
 
-            {/* Email input */}
             <label className="input input-bordered min-w-full flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -140,14 +111,13 @@ const Login = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="grow input outline-none focus:outline-none border-none border-[0px] h-auto pl-1 pr-0"
+                className="grow input outline-none focus:outline-none border-none h-auto pl-1 pr-0"
                 placeholder="Email"
                 required
                 disabled={isLoading}
               />
             </label>
 
-            {/* Password input */}
             <label className="input input-bordered flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -166,7 +136,7 @@ const Login = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="grow input outline-none focus:outline-none border-none border-[0px] h-auto pl-1 pr-0"
+                className="grow input outline-none focus:outline-none border-none h-auto pl-1 pr-0"
                 placeholder="Password"
                 required
                 disabled={isLoading}
@@ -183,28 +153,26 @@ const Login = () => {
                     className="checkbox w-4 h-4 rounded-md checkbox-primary"
                     disabled={isLoading}
                   />
-                  <span className="label-text text-xs">
-                    Remember me
-                  </span>
+                  <span className="label-text text-xs">Remember me</span>
                 </label>
               </div>
-              <a
+              {/* <a
                 href="#"
                 className="link link-primary font-semibold text-xs no-underline"
               >
                 Forgot Password?
-              </a>
+              </a> */}
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className={`btn btn-block btn-primary ${isLoading ? 'loading' : ''}`}
+              className={`btn btn-block btn-primary`}
             >
               {isLoading ? (
                 <>
-                  <span className="loading loading-spinner loading-sm"></span>
-                  Logging in...
+                  <span className="loading loading-spinner loading-xs"></span>
+                  <span className="ml-2">Logging in...</span>
                 </>
               ) : (
                 'Log In'

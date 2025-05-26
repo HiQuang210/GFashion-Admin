@@ -19,3 +19,13 @@ export interface User {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface CreateUserData {
+  email: string;
+  password: string;
+  phone: string;
+  address?: string;
+  img?: string;
+  firstName: string;
+  lastName: string;
+}

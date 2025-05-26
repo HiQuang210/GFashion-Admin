@@ -3,45 +3,24 @@ import { Link } from 'react-router-dom';
 import { HiBars3CenterLeft } from 'react-icons/hi2';
 import { DiReact } from 'react-icons/di';
 import { HiOutlineBell } from 'react-icons/hi';
-import { RxEnterFullScreen, RxExitFullScreen } from 'react-icons/rx';
 import ChangeThemes from './ChangesThemes';
 import toast from 'react-hot-toast';
-import { menu } from './menu/data';
+import { menu, settingsMenuItem } from './menu/data'; 
 import MenuItem from './menu/MenuItem';
+import FullscreenToggle from './FullscreenToggle';
 import { useAuth } from '../hooks/useAuth';
 
 const Navbar: React.FC = () => {
-  const [isFullScreen, setIsFullScreen] = React.useState(true);
-  const element = document.getElementById('root');
-
   const [isDrawerOpen, setDrawerOpen] = React.useState(false);
   const toggleDrawer = () => setDrawerOpen(!isDrawerOpen);
-
-  const toggleFullScreen = () => {
-    setIsFullScreen((prev) => !prev);
-  };
-
   const { user, logout } = useAuth();
-
   const handleLogout = () => {
-    toast.success('Logged out successfully!');
     logout(); 
   };
 
-  React.useEffect(() => {
-    if (isFullScreen) {
-      document.exitFullscreen();
-    } else {
-      element?.requestFullscreen({ navigationUI: 'auto' });
-    }
-  }, [element, isFullScreen]);
-
   return (
-    // navbar screen
     <div className="fixed z-[3] top-0 left-0 right-0 bg-base-100 w-full flex justify-between px-3 xl:px-4 py-3 xl:py-5 gap-4 xl:gap-0">
-      {/* container */}
       <div className="flex gap-3 items-center">
-        {/* for mobile */}
         <div className="drawer w-auto p-0 mr-1 xl:hidden">
           <input
             id="drawer-navbar-mobile"
@@ -64,31 +43,45 @@ const Navbar: React.FC = () => {
               aria-label="close sidebar"
               className="drawer-overlay"
             ></label>
-            <div className="menu p-4 w-auto min-h-full bg-base-200 text-base-content">
-              <Link
-                to={'/'}
-                className="flex items-center gap-1 xl:gap-2 mt-1 mb-5"
-              >
-                <DiReact className="text-3xl sm:text-4xl xl:text-4xl 2xl:text-6xl text-primary animate-spin-slow" />
-                <span className="text-[16px] leading-[1.2] sm:text-lg xl:text-xl 2xl:text-2xl font-semibold text-base-content dark:text-neutral-200">
-                  GFashion Dashboard
-                </span>
-              </Link>
-              {menu.map((item, index) => (
+            <div className="menu p-4 w-auto min-h-full bg-base-200 text-base-content flex flex-col">
+              
+              <div className="flex items-center gap-2 mb-4">
+                <button onClick={toggleDrawer} className="btn btn-ghost p-2 rotate-180">
+                  <HiBars3CenterLeft className="text-2xl" />
+                </button>
+                <span className="text-lg font-semibold text-base-content">Menu</span>
+              </div>
+
+              <div className="flex-1">
+                {menu.map((item, index) => (
+                  <MenuItem
+                    onClick={toggleDrawer}
+                    key={index}
+                    catalog={item.catalog}
+                    listItems={
+                      item.listItems.map((listItem: any) => ({
+                        ...listItem,
+                        onClick: listItem.onClick
+                          ? () => listItem.onClick(logout)
+                          : undefined,
+                      }))
+                    }
+                  />
+                ))}
+              </div>
+
+              <div className="mt-auto pt-4 border-t border-gray-300 dark:border-gray-600">
                 <MenuItem
                   onClick={toggleDrawer}
-                  key={index}
-                  catalog={item.catalog}
-                  listItems={
-                    item.listItems.map((listItem: any) => ({
-                      ...listItem,
-                      onClick: listItem.onClick
-                        ? () => listItem.onClick(logout)
-                        : undefined,
-                    }))
-                  }
+                  listItems={settingsMenuItem.listItems.map((listItem: any) => ({
+                    ...listItem,
+                    onClick: listItem.onClick
+                      ? () => listItem.onClick(logout)
+                      : undefined,
+                  }))}
+                  catalog={''}
                 />
-              ))}
+              </div>
             </div>
           </div>
         </div>
@@ -105,17 +98,7 @@ const Navbar: React.FC = () => {
       {/* navbar items to right */}
       <div className="flex items-center gap-0 xl:gap-1 2xl:gap-2 3xl:gap-5">
 
-        {/* fullscreen */}
-        <button
-          onClick={toggleFullScreen}
-          className="hidden xl:inline-flex btn btn-circle btn-ghost"
-        >
-          {isFullScreen ? (
-            <RxEnterFullScreen className="xl:text-xl 2xl:text-2xl 3xl:text-3xl" />
-          ) : (
-            <RxExitFullScreen className="xl:text-xl 2xl:text-2xl 3xl:text-3xl" />
-          )}
-        </button>
+        <FullscreenToggle />
 
         {/* notification */}
         <button

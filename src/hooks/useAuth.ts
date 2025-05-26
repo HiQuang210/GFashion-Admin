@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCookie, deleteCookie, isAuthenticated } from '../utils/cookieUltis';
-import { User } from '../types/User'
+import { User } from '../types/User';
 
 interface UseAuthReturn {
   user: User | null;
@@ -22,31 +22,29 @@ export const useAuth = (): UseAuthReturn => {
 
   const checkAuth = (): void => {
     try {
-        if (isAuthenticated()) {
+      if (isAuthenticated()) {
         const userData = getCookie('adminUser');
         if (userData) {
-            const parsedUser: User = JSON.parse(userData);
-            console.log('✅ Authenticated user from cookie:', parsedUser); // ✅ Log ở đây
-            setUser(parsedUser);
+          const parsedUser: User = JSON.parse(userData);
+          setUser(parsedUser);
         }
-        } else {
-        console.log('⚠️ No authentication token found.');
+      } else {
         setUser(null);
-        }
+      }
     } catch (error) {
-        console.error('❌ Auth check error:', error);
-        logout();
+      console.error('❌ Auth check error:', error);
+      logout();
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-    };
+  };
 
   const logout = (): void => {
     deleteCookie('adminToken');
     deleteCookie('adminRefreshToken');
     deleteCookie('adminUser');
     setUser(null);
-    navigate('/login');
+    navigate('/login'); 
   };
 
   return {

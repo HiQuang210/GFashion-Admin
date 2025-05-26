@@ -1,21 +1,13 @@
-import toast from 'react-hot-toast';
 import {
   HiOutlineHome,
-  HiOutlineUser,
   HiOutlineUsers,
   HiOutlineCube,
   HiOutlineClipboardDocumentList,
   HiOutlineDocumentChartBar,
   HiOutlinePencilSquare,
   HiOutlinePresentationChartBar,
-  HiOutlineArrowLeftOnRectangle,
 } from 'react-icons/hi2';
 import { IoSettingsOutline } from 'react-icons/io5';
-
-export const handleSignOut = (logout: () => void) => {
-  toast.success('Logged out successfully!');
-  logout();
-};
 
 export const menu = [
   {
@@ -70,28 +62,15 @@ export const menu = [
       },
     ],
   },
-  {
-    catalog: 'miscellaneous',
-    listItems: [
-      {
-        isLink: true,
-        url: '/profile',
-        icon: HiOutlineUser,
-        label: 'profile',
-      },
-      {
-        isLink: true,
-        url: '/settings',
-        icon: IoSettingsOutline,
-        label: 'settings',
-      },
-      {
-        isLink: false, 
-        url: '/login',
-        icon: HiOutlineArrowLeftOnRectangle,
-        label: 'Sign Out',
-        onClick: handleSignOut, 
-      },
-    ],
-  },
 ];
+
+export const settingsMenuItem = {
+  listItems: [
+    {
+      isLink: true,
+      url: '/settings',
+      icon: IoSettingsOutline,
+      label: 'settings',
+    },
+  ],
+};

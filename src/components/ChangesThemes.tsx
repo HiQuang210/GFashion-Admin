@@ -1,4 +1,3 @@
-// import React from 'react';
 import useTheme from '../contexts/useTheme';
 
 const ChangeThemes = () => {
@@ -10,7 +9,6 @@ const ChangeThemes = () => {
         <input
           onClick={toggleTheme}
           type="checkbox"
-          //   value="synthwave"
           className="theme-controller"
         />
         <svg

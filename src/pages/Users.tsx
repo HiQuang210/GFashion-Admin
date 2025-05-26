@@ -6,34 +6,33 @@ import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import AddUserData from '../components/AddUserData';
 import { HiCheck, HiX } from 'react-icons/hi';
-
-interface User {
-  _id: string;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  img?: string;
-  isActive: boolean;
-  phone?: string;
-  createdAt: string;
-  id?: string;
-  sequentialId?: number;
-}
+import { User } from '../types/User';
+import { useAuth } from '../hooks/useAuth';
 
 const Users = () => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const { user: currentUser } = useAuth(); 
+  
   const { isLoading, isError, isSuccess, data } = useQuery({
     queryKey: ['allusers'],
     queryFn: fetchUsers,
   });
 
-  // Process and sort user data
   const users = React.useMemo(() => {
     if (!data?.data) return [];
-    return data.data
+ 
+    const filteredUsers = data.data.filter((user: User) => 
+      currentUser ? user._id !== currentUser._id : true
+    );
+    
+    return filteredUsers
       .sort((a: User, b: User) => a._id.localeCompare(b._id))
-      .map((user: User, index: number) => ({ ...user, id: user._id, sequentialId: index + 1 }));
-  }, [data]);
+      .map((user: User, index: number) => ({ 
+        ...user, 
+        id: user._id, 
+        sequentialId: index + 1 
+      }));
+  }, [data, currentUser]);
 
   const columns: GridColDef[] = [
     { 
@@ -94,7 +93,6 @@ const Users = () => {
     },
   ];
 
-  // Handle toast notifications
   React.useEffect(() => {
     const toastId = 'promiseUsers';
     if (isLoading) toast.loading('Loading...', { id: toastId });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useQuery } from '@tanstack/react-query';
@@ -16,7 +16,7 @@ const User = () => {
 
   const user = data?.data;
 
-  const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
@@ -24,7 +24,7 @@ const User = () => {
     isActive: false,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isSuccess && user) {
       setFormData({
         firstName: user.firstName || '',
@@ -36,7 +36,7 @@ const User = () => {
     }
   }, [isSuccess, user]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isLoading) toast.loading('Loading...', { id: 'promiseRead' });
     if (isError) toast.error('Error while getting the data!', { id: 'promiseRead' });
     if (isSuccess) toast.success('Read the data successfully!', { id: 'promiseRead' });
