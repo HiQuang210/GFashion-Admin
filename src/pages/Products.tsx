@@ -4,7 +4,7 @@ import DataTable from '../components/DataTable';
 import { fetchProducts } from '../api/ApiCollection';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import AddProductData from '../components/AddProductData';
+import AddProductData from '../components/forms/AddProductData';
 
 const Products = () => {
   const [isOpen, setIsOpen] = React.useState(false);

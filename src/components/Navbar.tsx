@@ -17,6 +17,20 @@ const Navbar: React.FC = () => {
   const handleLogout = () => {
     logout(); 
   };
+  const [isDropdownOpen, setDropdownOpen] = React.useState(false);
+  const avatarRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (avatarRef.current && !avatarRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="fixed z-[3] top-0 left-0 right-0 bg-base-100 w-full flex justify-between px-3 xl:px-4 py-3 xl:py-5 gap-4 xl:gap-0">
@@ -116,23 +130,21 @@ const Navbar: React.FC = () => {
         </div>
 
         {/* avatar dropdown */}
-        <div className="dropdown dropdown-end">
-          <div
-            tabIndex={0}
-            role="button"
-            className="btn btn-ghost btn-circle avatar"
-          >
-            <div className="w-9 rounded-full">
-              <img
-                src={user?.img || '/Portrait_Placeholder.png'}
-                alt={user ? `${user.firstName} ${user.lastName}` : 'User'}
-              />
-            </div>
+        <div className="relative" ref={avatarRef}>
+        <button
+          onClick={() => setDropdownOpen(prev => !prev)}
+          className="btn btn-ghost btn-circle avatar"
+        >
+          <div className="w-9 rounded-full">
+            <img
+              src={user?.img || '/Portrait_Placeholder.png'}
+              alt={user ? `${user.firstName} ${user.lastName}` : 'User'}
+            />
           </div>
-          <ul
-            tabIndex={0}
-            className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-40"
-          >
+        </button>
+
+        {isDropdownOpen && (
+          <ul className="absolute right-0 mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-40">
             {user && (
               <li className="py-2 text-xs text-gray-500 border-b border-gray-200">
                 <span className="font-medium">
@@ -149,7 +161,8 @@ const Navbar: React.FC = () => {
               <a className="text-red-600 hover:bg-red-50">Sign Out</a>
             </li>
           </ul>
-        </div>
+        )}
+      </div>
       </div>
     </div>
   );

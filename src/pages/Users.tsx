@@ -3,8 +3,8 @@ import { GridColDef } from '@mui/x-data-grid';
 import DataTable from '../components/DataTable';
 import { fetchUsers } from '../api/ApiCollection';
 import { useQuery } from '@tanstack/react-query';
-import toast from 'react-hot-toast';
-import AddUserData from '../components/AddUserData';
+//import toast from 'react-hot-toast';
+import AddUserData from '../components/forms/AddUserData';
 import { HiCheck, HiX } from 'react-icons/hi';
 import { User } from '../types/User';
 import { useAuth } from '../hooks/useAuth';
@@ -93,12 +93,12 @@ const Users = () => {
     },
   ];
 
-  React.useEffect(() => {
-    const toastId = 'promiseUsers';
-    if (isLoading) toast.loading('Loading...', { id: toastId });
-    else if (isError) toast.error('Error while getting the data!', { id: toastId });
-    else if (isSuccess) toast.success('Got the data successfully!', { id: toastId });
-  }, [isError, isLoading, isSuccess]);
+  // React.useEffect(() => {
+  //   const toastId = 'promiseUsers';
+  //   if (isLoading) toast.loading('Loading...', { id: toastId });
+  //   else if (isError) toast.error('Error while getting the data!', { id: toastId });
+  //   else if (isSuccess) toast.success('Got the data successfully!', { id: toastId });
+  // }, [isError, isLoading, isSuccess]);
 
   return (
     <div className="w-full p-0 m-0">

@@ -2,10 +2,12 @@ import React from 'react';
 import { HiOutlinePencil } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import ChangePassword from '../components/forms/ChangePassword';
 import IntegrationSection from '../components/IntegrationSection';
 
 const Profile = () => {
   const modalDelete = React.useRef<HTMLDialogElement>(null);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = React.useState(false);
   const navigate = useNavigate();
   const { user, loading } = useAuth();
 
@@ -106,7 +108,10 @@ const Profile = () => {
                 <span>Member Since</span>
               </div>
               <div className="col-span-2 flex flex-col xl:gap-5">
-                <span className="link link-primary font-semibold cursor-pointer">
+                <span
+                  className="link link-primary font-semibold cursor-pointer"
+                  onClick={() => setIsChangePasswordOpen(true)}
+                >
                   Change Password
                 </span>
                 <span className={`font-semibold ${user.isActive ? 'text-success' : 'text-error'}`}>
@@ -121,6 +126,11 @@ const Profile = () => {
                 </span>
               </div>
             </div>
+            <ChangePassword
+              isOpen={isChangePasswordOpen}
+              setIsOpen={setIsChangePasswordOpen}
+              userId={user._id} 
+            />
           </div>
         </div>
         <IntegrationSection modalRef={modalDelete} />

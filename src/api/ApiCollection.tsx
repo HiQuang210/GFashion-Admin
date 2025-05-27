@@ -45,22 +45,41 @@ apiClient.interceptors.response.use(
   }
 );
 
+// REGISTER USER
+export const registerUser = async (newUser: CreateUserData) => {
+  try {
+    const userData = {
+      email: newUser.email,
+      password: newUser.password,
+      phone: newUser.phone,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+    };
+
+    console.log('Sending userData:', userData);
+
+    const response = await axios.post(`${API_BASE_URL}/user/sign-up`, userData, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error registering user:', error);
+    if (axios.isAxiosError(error)) {
+      console.error('Error details:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+    }
+    throw error;
+  }
+};
+
+// ADMIN LOGIN
 export const adminLoginUser = async (credentials: LoginCredentials): Promise<LoginResponse> => {
   try {
     const response = await axios.post<LoginResponse>(`${API_BASE_URL}/user/admin-sign-in`, credentials);
     return response.data;
   } catch (error) {
     console.error('Admin login error:', error);
-    throw error;
-  }
-};
-
-export const adminCreateUser = async (newUser: CreateUserData) => {
-  try {
-    const response = await apiClient.post('/user/sign-up', newUser);
-    return response.data;
-  } catch (error) {
-    console.error('Error creating user:', error);
     throw error;
   }
 };
@@ -100,17 +119,94 @@ export const fetchSingleUser = async (id: string) => {
   }
 };
 
-// UPDATE USER INFO
-export const updateUserByAdmin = async (id: string, updatedData: Partial<User>) => {
+// HELPER FUNCTION - Tạo FormData từ data và file
+const createFormData = (updatedData: Partial<User>, avatarFile?: File): FormData => {
+  const formData = new FormData();
+  
+  if (avatarFile) {
+    formData.append("avatar", avatarFile);
+  }
+
+  Object.entries(updatedData).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      formData.append(key, value.toString());
+    }
+  });
+
+  return formData;
+};
+
+// USER INFO UPDATE
+const updateUserGeneric = async (
+  endpoint: string,
+  id: string,
+  updatedData: Partial<User>,
+  avatarFile?: File,
+  logMessage?: string
+) => {
   try {
-    const response = await apiClient.put(`/user/admin-update-user/${id}`, updatedData);
-    console.log('User updated by admin:', response.data);
+    const formData = createFormData(updatedData, avatarFile);
+
+    const response = await apiClient.put(`${endpoint}/${id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    if (logMessage) {
+      console.log(logMessage, response.data);
+    }
+    
     return response.data;
   } catch (err) {
-    console.error('Failed to update user by admin:', err);
+    console.error(`Failed to update user via ${endpoint}:`, err);
     throw err;
   }
 };
+
+// UPDATE USER INFO (for regular users)
+export const updateUser = async (
+  id: string,
+  updatedData: Partial<User>,
+  avatarFile?: File 
+) => {
+  return updateUserGeneric(
+    '/user/update-user',
+    id,
+    updatedData,
+    avatarFile,
+    'User updated:'
+  );
+};
+
+// UPDATE USER INFO FOR ADMIN
+export const updateUserByAdmin = async (
+  id: string,
+  updatedData: Partial<User>,
+  avatarFile?: File
+) => {
+  return updateUserGeneric(
+    '/user/admin-update-user',
+    id,
+    updatedData,
+    avatarFile,
+    'User updated by admin:'
+  );
+};
+
+// CHANGE PASSWORD
+export const changePassword = (
+  id: string,
+  { oldPassword, newPassword }: { oldPassword: string; newPassword: string }
+) => {
+  return apiClient
+    .put(`/user/change-password/${id}`, {
+      oldPassword,
+      newPassword,
+    })
+    .then((res) => res.data);
+};
+
 
 // GET TOTAL PRODUCTS
 export const fetchTotalProducts = async () => {
