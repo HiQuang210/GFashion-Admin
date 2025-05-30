@@ -12,11 +12,11 @@ const VariantSummaryCell: React.FC<VariantSummaryCellProps> = ({
 }) => (
   <div className="flex flex-col gap-1 mt-1">
     <div className="flex items-center gap-2">
-      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded flex items-center gap-1">
+      <span className="text-xs bg-primary/10 px-2 py-1 rounded flex items-center gap-1">
         <Palette className="w-3 h-3" />
         {product.variants.length} color(s)
       </span>
-      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded flex items-center gap-1">
+      <span className="text-xs bg-secondary/10 px-2 py-1 rounded flex items-center gap-1">
         <Ruler className="w-3 h-3" />
         {product.variants.reduce((total, variant) => total + variant.sizes.length, 0)} size
       </span>

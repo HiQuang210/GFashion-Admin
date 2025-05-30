@@ -1,5 +1,5 @@
 import axios, { AxiosResponse, AxiosError } from 'axios';
-import { getCookie, deleteCookie } from '../utils/cookieUltis';
+import { getCookie, deleteCookie } from '../utils/cookieUtils';
 import { CreateUserData, User } from '../types/User'; 
 
 const API_BASE_URL = 'http://localhost:5000/api';
@@ -266,6 +266,53 @@ export const fetchSingleProduct = async (id: string) => {
     return response.data;
   } catch (error) {
     console.error('Failed to fetch product detail:', error);
+    throw error;
+  }
+};
+
+// UPDATE PRODUCT BY ID
+export const updateProduct = async (id: string, productData: Partial<Product>, removedImages: string[] = []) => {
+  try {
+    const formData = new FormData();
+
+    if (productData.name) formData.append('name', productData.name);
+    if (productData.type) formData.append('type', productData.type);
+    if (productData.price !== undefined) formData.append('price', productData.price.toString());
+    if (productData.producer) formData.append('producer', productData.producer);
+    if (productData.description) formData.append('description', productData.description);
+    if (productData.material) formData.append('material', productData.material);
+
+    if (productData.variants) {
+      formData.append('variants', JSON.stringify(productData.variants));
+    }
+
+    if (removedImages.length > 0) {
+      formData.append('removedImages', JSON.stringify(removedImages));
+    }
+
+    if (productData.images) {
+      const newImageFiles = productData.images.filter(img => img.startsWith('data:'));
+      
+      for (let i = 0; i < newImageFiles.length; i++) {
+        const base64Image = newImageFiles[i];
+        const response = await fetch(base64Image);
+        const blob = await response.blob();
+        
+        const file = new File([blob], `image_${i}.jpg`, { type: 'image/jpeg' });
+        formData.append('images', file);
+      }
+    }
+
+    const response = await apiClient.put(`/product/update/${id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    console.log('Product updated successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to update product:', error);
     throw error;
   }
 };

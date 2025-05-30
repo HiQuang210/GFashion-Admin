@@ -1,5 +1,4 @@
 
-// Define TypeScript interfaces based on your backend model
 interface Size {
   size: string;
   stock: number;
@@ -31,4 +30,25 @@ interface Product {
 interface ProductWithIndex extends Product {
   id: string;
   index: number;
+}
+
+interface ProductImageGalleryProps {
+  images: string[];
+  productName: string;
+  selectedImageIndex: number;
+  onImageSelect: (index: number) => void;
+  onImageClick: () => void;
+  isEditing?: boolean;
+  onImagesChange?: (images: string[]) => void;
+}
+
+interface ImageModalProps {
+  isOpen: boolean;
+  images: string[];
+  productName: string;
+  selectedImageIndex: number;
+  onClose: () => void;
+  onImageSelect: (index: number) => void;
+  isEditing?: boolean;
+  onImagesChange?: (images: string[]) => void;
 }

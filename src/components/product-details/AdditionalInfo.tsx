@@ -4,9 +4,21 @@ import { HiOutlineCalendar } from 'react-icons/hi2';
 
 interface ProductAdditionalInfoProps {
   product: Product;
+  isEditing?: boolean;
+  onProductChange?: (field: keyof Product, value: any) => void;
 }
 
-const ProductAdditionalInfo: React.FC<ProductAdditionalInfoProps> = ({ product }) => {
+const ProductAdditionalInfo: React.FC<ProductAdditionalInfoProps> = ({ 
+  product, 
+  isEditing = false, 
+  onProductChange 
+}) => {
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (onProductChange) {
+      onProductChange('description', e.target.value);
+    }
+  };
+
   return (
     <div className="card bg-base-100 shadow-xl">
       <div className="card-body">
@@ -16,12 +28,20 @@ const ProductAdditionalInfo: React.FC<ProductAdditionalInfoProps> = ({ product }
         </h3>
         
         <div className="space-y-3">
-          {product.description && (
-            <div>
-              <label className="text-sm font-medium text-base-content/70">Description</label>
-              <p className="text-sm mt-1">{product.description}</p>
-            </div>
-          )}
+          <div>
+            <label className="text-sm font-medium text-base-content/70">Description</label>
+            {isEditing ? (
+              <textarea
+                value={product.description || ''}
+                onChange={handleDescriptionChange}
+                placeholder="Enter product description..."
+                className="textarea textarea-bordered w-full mt-1 min-h-[100px] text-sm"
+                rows={4}
+              />
+            ) : (
+              <p className="text-sm mt-1">{product.description || 'No description available'}</p>
+            )}
+          </div>
           
           <div>
             <label className="text-sm font-medium text-base-content/70">Created At</label>

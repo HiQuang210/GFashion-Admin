@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCookie, deleteCookie } from '../utils/cookieUltis';
+import { getCookie, deleteCookie } from '../utils/cookieUtils';
 import { User } from '../types/User';
 import { fetchSingleUser } from '../api/ApiCollection';
 

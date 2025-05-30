@@ -1,6 +1,6 @@
 import { ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { isAuthenticated } from '../utils/cookieUltis'
+import { isAuthenticated } from '../utils/cookieUtils'
 
 interface ProtectedRouteProps {
   children: ReactNode;
