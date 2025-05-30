@@ -1,153 +1,124 @@
-import React from 'react';
-import { GridColDef } from '@mui/x-data-grid';
+import React, { useState, useEffect } from 'react';
 import DataTable from '../components/DataTable';
-import { fetchProducts } from '../api/ApiCollection';
+import { fetchAdminProducts } from '../api/ApiCollection';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import AddProductData from '../components/forms/AddProductData';
+import VariantDetailsModal from '../components/products/VariantDetailsModal';
+import SummaryStatistics from '../components/products/SummaryStatistics';
+import { createProductColumns } from '../components/products/ProductColumns';
+import { getTotalStock, getTotalVariants } from '../utils/productHelper';
 
-const Products = () => {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const { isLoading, isError, isSuccess, data } = useQuery({
-    queryKey: ['allproducts'],
-    queryFn: fetchProducts,
+const Products: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<ProductWithIndex | null>(null);
+  const [isVariantModalOpen, setIsVariantModalOpen] = useState(false);
+  
+  const queryParams = {
+    page: 1,
+    limitItem: 50,
+    sort: '',
+    filter: '',
+    searchQuery: '',
+  };
+
+  const { isLoading, isError, isSuccess, data: response } = useQuery({
+    queryKey: ['adminProducts', queryParams],
+    queryFn: ({ queryKey }) => {
+      const [, params] = queryKey as [string, Parameters<typeof fetchAdminProducts>[0]];
+      return fetchAdminProducts(params);
+    },
   });
 
-  const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 90 },
-    {
-      field: 'img',
-      headerName: 'Product',
-      minWidth: 300,
-      flex: 1,
-      renderCell: (params) => {
-        return (
-          <div className="flex gap-3 items-center">
-            <div className="w-6 xl:w-10 overflow-hidden flex justify-center items-center">
-              <img
-                src={params.row.img || '/corrugated-box.jpg'}
-                alt="product-picture"
-                className="object-cover"
-              />
-            </div>
-            <span className="mb-0 pb-0 leading-none">
-              {params.row.title}
-            </span>
-          </div>
-        );
-      },
-    },
-    // {
-    //   field: 'title',
-    //   type: 'string',
-    //   headerName: 'Title',
-    //   width: 250,
-    // },
-    {
-      field: 'color',
-      type: 'string',
-      headerName: 'Color',
-      minWidth: 100,
-      flex: 1,
-    },
-    {
-      field: 'price',
-      type: 'string',
-      headerName: 'Price',
-      minWidth: 100,
-      flex: 1,
-    },
-    {
-      field: 'producer',
-      headerName: 'Producer',
-      type: 'string',
-      minWidth: 100,
-      flex: 1,
-    },
-    {
-      field: 'createdAt',
-      headerName: 'Created At',
-      minWidth: 100,
-      type: 'string',
-      flex: 1,
-    },
-    {
-      field: 'inStock',
-      headerName: 'In Stock',
-      minWidth: 80,
-      type: 'boolean',
-      flex: 1,
-    },
-  ];
+  const handleViewVariantDetails = (product: ProductWithIndex) => {
+    setSelectedProduct(product);
+    setIsVariantModalOpen(true);
+  };
 
-  React.useEffect(() => {
+  const handleCloseVariantModal = () => {
+    setIsVariantModalOpen(false);
+    setSelectedProduct(null);
+  };
+
+  const columns = createProductColumns(handleViewVariantDetails);
+
+  useEffect(() => {
     if (isLoading) {
       toast.loading('Loading...', { id: 'promiseProducts' });
-    }
-    if (isError) {
-      toast.error('Error while getting the data!', {
-        id: 'promiseProducts',
-      });
-    }
-    if (isSuccess) {
-      toast.success('Got the data successfully!', {
-        id: 'promiseProducts',
-      });
+    } else if (isError) {
+      toast.error('Error while getting the data!', { id: 'promiseProducts' });
+    } else if (isSuccess) {
+      toast.success('Got the data successfully!', { id: 'promiseProducts' });
     }
   }, [isError, isLoading, isSuccess]);
+
+  const rowsWithIndex: ProductWithIndex[] = response?.data
+    ? [...response.data]
+        .sort((a: Product, b: Product) => 
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        )
+        .map((item: Product, index: number) => ({
+          ...item,
+          id: item._id, 
+          index: index + 1,
+        }))
+    : [];
+
+  // Calculate summary statistics
+  const totalProducts = rowsWithIndex.length;
+  const totalVariants = getTotalVariants(rowsWithIndex);
+  const totalStock = rowsWithIndex.reduce((total: number, product: ProductWithIndex) => 
+    total + getTotalStock(product.variants), 0
+  );
 
   return (
     <div className="w-full p-0 m-0">
       <div className="w-full flex flex-col items-stretch gap-3">
+        {/* Header */}
         <div className="w-full flex justify-between xl:mb-5">
           <div className="flex gap-1 justify-start flex-col items-start">
             <h2 className="font-bold text-2xl xl:text-4xl mt-0 pt-0 text-base-content dark:text-neutral-200">
               Products
             </h2>
-            {data && data.length > 0 && (
+            {rowsWithIndex.length > 0 && (
               <span className="text-neutral dark:text-neutral-content font-medium text-base">
-                {data.length} Products Found
+                {rowsWithIndex.length} Products Found
               </span>
             )}
           </div>
           <button
             onClick={() => setIsOpen(true)}
-            className={`btn ${
-              isLoading ? 'btn-disabled' : 'btn-primary'
-            }`}
+            className={`btn ${isLoading ? 'btn-disabled' : 'btn-primary'}`}
           >
             Add New Product +
           </button>
         </div>
 
-        {isLoading ? (
-          <DataTable
-            slug="products"
-            columns={columns}
-            rows={[]}
-            includeActionColumn={true}
+        {/* Summary Statistics */}
+        {rowsWithIndex.length > 0 && (
+          <SummaryStatistics
+            totalProducts={totalProducts}
+            totalVariants={totalVariants}
+            totalStock={totalStock}
           />
-        ) : isSuccess ? (
-          <DataTable
-            slug="products"
-            columns={columns}
-            rows={data}
-            includeActionColumn={true}
-          />
-        ) : (
-          <>
-            <DataTable
-              slug="products"
-              columns={columns}
-              rows={[]}
-              includeActionColumn={true}
-            />
-            <div className="w-full flex justify-center">
-              Error while getting the data!
-            </div>
-          </>
         )}
 
+        {/* Data Table */}
+        <DataTable
+          slug="products"
+          columns={columns}
+          rows={rowsWithIndex}
+          includeActionColumn={true}
+        />
+
+        {/* Variant Details Modal */}
+        <VariantDetailsModal
+          product={selectedProduct}
+          isOpen={isVariantModalOpen}
+          onClose={handleCloseVariantModal}
+        />
+
+        {/* Add Product Modal */}
         {isOpen && (
           <AddProductData
             isOpen={isOpen}

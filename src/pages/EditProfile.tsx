@@ -13,6 +13,7 @@ const EditProfile = () => {
   const { user, loading } = useAuth();
   const [preview, setPreview] = useState<string>('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -40,7 +41,10 @@ const EditProfile = () => {
 
   const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) setPreview(URL.createObjectURL(file));
+    if (file) {
+      setPreview(URL.createObjectURL(file));
+      setAvatarFile(file); 
+    }
   };
 
   const validateForm = () => {
@@ -53,10 +57,7 @@ const EditProfile = () => {
   };
 
   const handleSave = async () => {
-    if (!user?._id) {
-      toast.error('User ID not found');
-      return;
-    }
+    if (!user?._id) return toast.error('User ID not found');
     if (!validateForm()) return;
 
     setIsUpdating(true);
@@ -66,17 +67,17 @@ const EditProfile = () => {
         return acc;
       }, {} as any);
 
-      const res = await updateUser(user._id, updateData);
-      
+      const res = await updateUser(user._id, updateData, avatarFile || undefined);
+
       if (res.status === 'OK') {
         toast.success('Profile updated successfully!');
         setTimeout(() => window.location.href = '/profile', 1000);
       } else {
         toast.error('Failed to update profile');
-        setIsUpdating(false);
       }
     } catch (err: any) {
       toast.error(err?.response?.data?.message || err?.message || 'Update failed');
+    } finally {
       setIsUpdating(false);
     }
   };

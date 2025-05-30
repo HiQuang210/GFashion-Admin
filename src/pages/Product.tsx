@@ -1,260 +1,150 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSingleProduct } from '../api/ApiCollection';
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts';
+import { getTotalStock } from '../utils/productHelper';
+import toast from 'react-hot-toast';
+import { HiOutlineArrowLeft, HiOutlinePencilSquare, HiOutlineTrash } from 'react-icons/hi2';
+import ProductImageGallery from '../components/product-details/ImageGallery';
+import ProductBasicInfo from '../components/product-details/BasicInfo';
+import ProductStockStats from '../components/product-details/StockStat';
+import ProductVariants from '../components/product-details/Variants';
+import ProductAdditionalInfo from '../components/product-details/AdditionalInfo';
+import ImageModal from '../components/product-details/ImageModal';
 
-const Product = () => {
-  const tempEntries: number[] = [1, 2, 3, 4, 5];
-  const dataLine = [
-    {
-      name: 'Jan',
-      purchased: 4000,
-      wishlisted: 2400,
-      amt: 2400,
-    },
-    {
-      name: 'Feb',
-      purchased: 3000,
-      wishlisted: 1398,
-      amt: 2210,
-    },
-    {
-      name: 'Mar',
-      purchased: 2000,
-      wishlisted: 9800,
-      amt: 2290,
-    },
-    {
-      name: 'Apr',
-      purchased: 2780,
-      wishlisted: 3908,
-      amt: 2000,
-    },
-    {
-      name: 'May',
-      purchased: 1890,
-      wishlisted: 4800,
-      amt: 2181,
-    },
-    {
-      name: 'Jun',
-      purchased: 2390,
-      wishlisted: 3800,
-      amt: 2500,
-    },
-    {
-      name: 'Jul',
-      purchased: 3490,
-      wishlisted: 4300,
-      amt: 2100,
-    },
-  ];
+const Product: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
-  // const [user, setUser] = React.useState();
-  const { id } = useParams();
-  // const navigate = useNavigate();
-
-  const { isLoading, isError, data, isSuccess } = useQuery({
-    queryKey: ['user', id],
-    queryFn: () => fetchSingleProduct(id || ''),
+  const { isLoading, isError, data: response } = useQuery({
+    queryKey: ['productDetail', id],
+    queryFn: () => fetchSingleProduct(id!),
+    enabled: !!id,
   });
 
   React.useEffect(() => {
     if (isLoading) {
-      toast.loading('Loading...', { id: 'promiseRead' });
+      toast.loading('Loading product details...', { id: 'productDetail' });
+    } else if (isError) {
+      toast.error('Failed to load product details!', { id: 'productDetail' });
+    } else if (response) {
+      toast.success('Product details loaded successfully!', { id: 'productDetail' });
     }
-    if (isError) {
-      toast.error('Error while getting the data!', {
-        id: 'promiseRead',
-      });
-    }
-    if (isSuccess) {
-      toast.success('Read the data successfully!', {
-        id: 'promiseRead',
-      });
-    }
-  }, [isError, isLoading, isSuccess]);
+  }, [isLoading, isError, response]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="loading loading-spinner loading-lg"></div>
+      </div>
+    );
+  }
+
+  if (isError || !response?.data) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-error mb-4">Product Not Found</h2>
+          <button 
+            onClick={() => navigate('/products')}
+            className="btn btn-primary"
+          >
+            Back to Products
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const product: Product = response.data;
+  const totalStock = getTotalStock(product.variants);
+  const totalVariants = product.variants.length;
+
+  const handleEditProduct = () => {
+    toast('Edit functionality to be implemented');
+  };
+
+  const handleDeleteProduct = () => {
+    toast('Delete functionality to be implemented');
+  };
 
   return (
-    // screen
-    <div id="singleProduct" className="w-full p-0 m-0">
-      {/* container */}
-      <div className="w-full grid xl:grid-cols-2 gap-10 mt-5 xl:mt-0">
-        {/* column 1 */}
-        <div className="w-full flex flex-col items-start gap-10">
-          {/* product block */}
-          <div className="w-full flex flex-col items-start gap-5">
-            {/* photo block */}
-            <div className="w-full flex items-center gap-3">
-              <div className="flex items-center gap-3 xl:gap-8 xl:mb-4">
-                <div className="">
-                  {isLoading ? (
-                    <div className="w-24 xl:w-36 h-24 xl:h-36 skeleton dark:bg-neutral"></div>
-                  ) : isSuccess ? (
-                    <div className="w-24 xl:w-36">
-                      <img
-                        src={data.img}
-                        alt="avatar"
-                        className="w-full h-auto object-cover"
-                      />
-                    </div>
-                  ) : (
-                    ''
-                  )}
-                </div>
-                <div className="flex flex-col items-start gap-1">
-                  {isLoading ? (
-                    <div className="w-[200px] h-[36px] skeleton dark:bg-neutral"></div>
-                  ) : isSuccess ? (
-                    <h3 className="font-semibold text-xl xl:text-3xl dark:text-white">
-                      {data.title}
-                    </h3>
-                  ) : (
-                    <div className="w-[200px] h-[36px] skeleton dark:bg-neutral"></div>
-                  )}
-                  <span className="font-normal text-base">
-                    Exclusive
-                  </span>
-                </div>
-              </div>
-            </div>
-            {/* detail block */}
-            <div className="w-full flex gap-8">
-              {isLoading ? (
-                <div className="w-full xl:w-[50%} h-52 skeleton dark:bg-neutral"></div>
-              ) : isSuccess ? (
-                <div className="w-full grid grid-cols-3 xl:flex gap-5 xl:gap-8">
-                  {/* column 1 */}
-                  <div className="col-span-1 flex flex-col items-start gap-3 xl:gap-5">
-                    <span>Product ID</span>
-                    <span>Color</span>
-                    <span>Price</span>
-                    <span>Producer</span>
-                    <span>Status</span>
-                  </div>
-                  {/* column 2 */}
-                  <div className="col-span-2 flex flex-col items-start gap-3 xl:gap-5">
-                    <span className="font-semibold">{data.id}</span>
-                    <span className="font-semibold">
-                      {data.color}
-                    </span>
-                    <span className="font-semibold">
-                      {data.price}
-                    </span>
-                    <span className="font-semibold">
-                      {data.producer}
-                    </span>
-                    <span className="font-semibold">
-                      {data.inStock ? 'In stock' : 'Out of stock'}
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <div className="w-full xl:w-[50%} h-52 skeleton dark:bg-neutral"></div>
-              )}
+    <div className="min-h-screen bg-base-100 p-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate('/products')}
+              className="btn btn-ghost btn-circle"
+            >
+              <HiOutlineArrowLeft size={20} />
+            </button>
+            <div>
+              <h1 className="text-3xl font-bold text-base-content">Product Details</h1>
+              <p className="text-base-content/70">ID: {product._id}</p>
             </div>
           </div>
-          {/* divider */}
-          <div className="w-full h-[2px] bg-base-300 dark:bg-slate-700"></div>
-          {/* chart */}
-          {isLoading ? (
-            <div className="w-full min-h-[300px] skeleton dark:bg-neutral"></div>
-          ) : isSuccess ? (
-            <div className="w-full min-h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={dataLine}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="purchased"
-                    stroke="#8884d8"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="wishlisted"
-                    stroke="#82ca9d"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className="w-full min-h-[300px] skeleton dark:bg-neutral"></div>
-          )}
+          
+          <div className="flex gap-2">
+            <button
+              onClick={handleEditProduct}
+              className="btn btn-primary"
+            >
+              <HiOutlinePencilSquare size={16} />
+              <span className="hidden sm:inline">Edit Product</span>
+              <span className="sm:hidden">Edit</span>
+            </button>
+            <button
+              onClick={handleDeleteProduct}
+              className="btn btn-error"
+            >
+              <HiOutlineTrash size={16} />
+              <span className="hidden sm:inline">Delete</span>
+            </button>
+          </div>
         </div>
-        {/* column 2 */}
-        <div
-          id="activities"
-          className="w-full flex flex-col items-start gap-5"
-        >
-          <h2 className="text-2xl font-semibold dark:text-white">
-            Latest Activities
-          </h2>
-          {isLoading &&
-            tempEntries.map((index: number) => (
-              <div
-                className="w-full h-20 skeleton dark:bg-neutral"
-                key={index}
-              ></div>
-            ))}
-          {isSuccess && (
-            <ul>
-              <li>
-                <div className="ml-[1px] relative p-4 bg-base-200 dark:bg-neutral dark:text-neutral-50 min-w-[85vw] xl:min-w-[480px] flex flex-col items-start gap-3">
-                  <span>Frans AHW purchased {data.title}</span>
-                  <span className="text-xs">3 days ago</span>
-                </div>
-              </li>
-              <li>
-                <div className="ml-[1px] relative p-4 bg-base-200 dark:bg-neutral dark:text-neutral-50 min-w-[85vw] xl:min-w-[480px] flex flex-col items-start gap-3">
-                  <span>
-                    Kurt Cobain added {data.title} into wishlist
-                  </span>
-                  <span className="text-xs">1 week ago</span>
-                </div>
-              </li>
-              <li>
-                <div className="ml-[1px] relative p-4 bg-base-200 dark:bg-neutral dark:text-neutral-50 min-w-[85vw] xl:min-w-[480px] flex flex-col items-start gap-3">
-                  <span>Mary Jane purchased {data.title}</span>
-                  <span className="text-xs">2 weeks ago</span>
-                </div>
-              </li>
-              <li>
-                <div className="ml-[1px] relative p-4 bg-base-200 dark:bg-neutral dark:text-neutral-50 min-w-[85vw] xl:min-w-[480px] flex flex-col items-start gap-3">
-                  <span>
-                    Jose Rose added {data.title} into wishlist
-                  </span>
-                  <span className="text-xs">3 weeks ago</span>
-                </div>
-              </li>
-              <li>
-                <div className="ml-[1px] relative p-4 bg-base-200 dark:bg-neutral dark:text-neutral-50 min-w-[85vw] xl:min-w-[480px] flex flex-col items-start gap-3">
-                  <span>James Deane purchased {data.title}</span>
-                  <span className="text-xs">1 month ago</span>
-                </div>
-              </li>
-            </ul>
-          )}
-          {isError &&
-            tempEntries.map((index: number) => (
-              <div
-                className="w-full h-20 skeleton dark:bg-neutral"
-                key={index}
-              ></div>
-            ))}
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Images */}
+          <div className="lg:col-span-1">
+            <ProductImageGallery
+              images={product.images ?? []}
+              productName={product.name}
+              selectedImageIndex={selectedImageIndex}
+              onImageSelect={setSelectedImageIndex}
+              onImageClick={() => setIsImageModalOpen(true)}
+            />
+          </div>
+
+          {/* Middle Column - Basic Info */}
+          <div className="lg:col-span-1">
+            <ProductBasicInfo product={product} />
+            <ProductStockStats 
+              totalStock={totalStock} 
+              totalVariants={totalVariants} 
+            />
+          </div>
+
+          {/* Right Column - Variants & Additional Info */}
+          <div className="lg:col-span-1">
+            <ProductVariants variants={product.variants} />
+            <ProductAdditionalInfo product={product} />
+          </div>
         </div>
+
+        {/* Image Modal */}
+        <ImageModal
+          isOpen={isImageModalOpen}
+          images={product.images ?? []}
+          productName={product.name}
+          selectedImageIndex={selectedImageIndex}
+          onClose={() => setIsImageModalOpen(false)}
+          onImageSelect={setSelectedImageIndex}
+        />
       </div>
     </div>
   );

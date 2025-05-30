@@ -17,6 +17,14 @@ interface LoginResponse {
   userInfo: User;
 }
 
+interface FetchAdminProductsParams {
+  limitItem?: number;
+  page?: number;
+  sort?: string;
+  filter?: string;
+  searchQuery?: string;
+}
+
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
 });
@@ -58,7 +66,7 @@ export const registerUser = async (newUser: CreateUserData) => {
 
     console.log('Sending userData:', userData);
 
-    const response = await axios.post(`${API_BASE_URL}/user/sign-up`, userData, {
+    const response = await apiClient.post('/user/sign-up', userData, {
       headers: { 'Content-Type': 'application/json' },
     });
 
@@ -76,7 +84,10 @@ export const registerUser = async (newUser: CreateUserData) => {
 // ADMIN LOGIN
 export const adminLoginUser = async (credentials: LoginCredentials): Promise<LoginResponse> => {
   try {
-    const response = await axios.post<LoginResponse>(`${API_BASE_URL}/user/admin-sign-in`, credentials);
+    const response = await apiClient.post<LoginResponse>(
+      '/user/admin-sign-in',
+      credentials
+    );
     return response.data;
   } catch (error) {
     console.error('Admin login error:', error);
@@ -207,21 +218,56 @@ export const changePassword = (
     .then((res) => res.data);
 };
 
+// GET ALL PRODUCTS FOR ADMIN
+export const fetchAdminProducts = async (params: FetchAdminProductsParams = {}) => {
+  try {
+    const response = await apiClient.get('/product/get-all-admin', {
+      params: {
+        limitItem: params.limitItem || 10,
+        page: params.page || 1,
+        sort: params.sort || '',
+        filter: params.filter || '',
+        searchQuery: params.searchQuery || '',
+      },
+    });
+
+    console.log('Admin products:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Fetch admin products failed:', error);
+    throw error;
+  }
+};
 
 // GET TOTAL PRODUCTS
 export const fetchTotalProducts = async () => {
-  const response = await axios
-    .get('https://react-admin-ui-v1-api.vercel.app/totalproducts')
-    .then((res) => {
-      console.log('axios get:', res.data);
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-      throw err;
+  try {
+    const response = await apiClient.get('/product/get-all-admin', {
+      params: {
+        limitItem: 1, 
+        page: 1,
+      },
     });
 
-  return response;
+    const total = response.data?.totalItems ?? 0;
+    console.log('Total products:', total);
+    return total;
+  } catch (error) {
+    console.error('Failed to fetch total products:', error);
+    throw error;
+  }
+};
+
+// GET SINGLE PRODUCT BY ID
+export const fetchSingleProduct = async (id: string) => {
+  try {
+    const response = await apiClient.get(`/product/get-detail/${id}`);
+    console.log('Fetched product detail:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch product detail:', error);
+    throw error;
+  }
 };
 
 // GET TOTAL RATIO
@@ -326,41 +372,6 @@ export const fetchTotalRevenueByProducts = async () => {
 export const fetchTotalProfit = async () => {
   const response = await axios
     .get('https://react-admin-ui-v1-api.vercel.app/totalprofit')
-    .then((res) => {
-      console.log('axios get:', res.data);
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-      throw err;
-    });
-
-  return response;
-};
-
-//UPLOAD PROFILE PICTURE
-
-
-// GET ALL PRODUCTS
-export const fetchProducts = async () => {
-  const response = await axios
-    .get('https://react-admin-ui-v1-api.vercel.app/products')
-    .then((res) => {
-      console.log('axios get:', res.data);
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-      throw err;
-    });
-
-  return response;
-};
-
-// GET SINGLE PRODUCT
-export const fetchSingleProduct = async (id: string) => {
-  const response = await axios
-    .get(`https://react-admin-ui-v1-api.vercel.app/products/${id}`)
     .then((res) => {
       console.log('axios get:', res.data);
       return res.data;

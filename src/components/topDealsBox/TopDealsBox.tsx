@@ -45,7 +45,7 @@ const TopDealsBox = () => {
         {isSuccess &&
           data.map((user: topDealsUser, index: number) => (
             <button
-              onClick={() => toast('Gabisa!', { icon: '😠' })}
+              onClick={() => toast('None')}
               key={index}
               className="w-full flex justify-between items-center h-auto btn btn-ghost px-1 py-2"
             >

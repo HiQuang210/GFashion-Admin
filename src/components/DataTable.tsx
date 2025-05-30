@@ -29,7 +29,7 @@ const DataTable: React.FC<DataTableProps> = ({
   const actionColumn: GridColDef = {
     field: 'action',
     headerName: 'Action',
-    minWidth: 200,
+    minWidth: 100,
     flex: 1,
     renderCell: (params) => {
       return (

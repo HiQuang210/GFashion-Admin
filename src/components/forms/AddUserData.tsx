@@ -1,9 +1,10 @@
-import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, FormEvent, useState } from 'react';
 import toast from 'react-hot-toast';
 import { HiOutlineXMark } from 'react-icons/hi2';
 import { PiEyeBold, PiEyeClosedBold } from 'react-icons/pi';
 import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../../api/ApiCollection'; 
+import { useModalTransition } from '../../hooks/useModalTransition';
 
 interface AddUserDataProps {
   isOpen: boolean;
@@ -74,7 +75,6 @@ const PasswordInput = ({
 
 const AddUserData: React.FC<AddUserDataProps> = ({ isOpen, setIsOpen, onUserAdded }) => {
   const navigate = useNavigate();
-  const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -98,13 +98,14 @@ const AddUserData: React.FC<AddUserDataProps> = ({ isOpen, setIsOpen, onUserAdde
     setIsLoading(false);
   };
 
-  const handleClose = () => {
-    setShowModal(false);
-    setTimeout(() => {
+  const { showModal, handleClose } = useModalTransition({
+    isOpen,
+    onClose: () => {
       setIsOpen(false);
       resetForm();
-    }, 300);
-  };
+    },
+  });
+
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -142,12 +143,6 @@ const AddUserData: React.FC<AddUserDataProps> = ({ isOpen, setIsOpen, onUserAdde
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    setShowModal(isOpen);
-  }, [isOpen]);
-
-  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/75 z-50">

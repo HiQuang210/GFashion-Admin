@@ -84,7 +84,7 @@ const Navbar: React.FC = () => {
                 ))}
               </div>
 
-              <div className="mt-auto pt-4 border-t border-gray-300 dark:border-gray-600">
+              <div className="mt-auto pt-4 border-t border-white dark:border-gray-600">
                 <MenuItem
                   onClick={toggleDrawer}
                   listItems={settingsMenuItem.listItems.map((listItem: any) => ({
@@ -146,7 +146,7 @@ const Navbar: React.FC = () => {
         {isDropdownOpen && (
           <ul className="absolute right-0 mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-40">
             {user && (
-              <li className="py-2 text-xs text-gray-500 border-b border-gray-200">
+              <li className="py-2 text-xs text-gray-400 border-b border-gray-200">
                 <span className="font-medium">
                   Hi {user.firstName} {user.lastName}
                 </span>
