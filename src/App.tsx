@@ -25,6 +25,7 @@ import Product from './pages/Product';
 import Login from './pages/Login';
 import Settings from './pages/Setting';
 import ProtectedRoute from './components/ProtectedRoute';
+import AddProduct from './pages/AddProduct';
 
 function App() {
   const Layout = () => {
@@ -64,6 +65,7 @@ function App() {
       { path: '/users/:id', element: <User /> },
       { path: '/products', element: <Products /> },
       { path: '/products/:id', element: <Product /> },
+      { path: '/product/add', element: <AddProduct/> },
       { path: '/orders', element: <Orders /> },
       { path: '/posts', element: <Posts /> },
       { path: '/notes', element: <Notes /> },

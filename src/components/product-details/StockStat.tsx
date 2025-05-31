@@ -1,4 +1,3 @@
-// components/ProductStockStats.tsx
 import React from 'react';
 import { HiOutlineCube } from 'react-icons/hi2';
 

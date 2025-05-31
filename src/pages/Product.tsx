@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchSingleProduct, updateProduct } from '../api/ApiCollection';
+import { fetchSingleProduct, updateProduct, deleteProduct } from '../api/ApiCollection';
 import { getTotalStock } from '../utils/productHelper';
 import toast from 'react-hot-toast';
 import { HiOutlineArrowLeft, HiOutlinePencilSquare, HiOutlineTrash, HiOutlineCheck } from 'react-icons/hi2';
@@ -11,6 +11,7 @@ import ProductStockStats from '../components/product-details/StockStat';
 import ProductVariants from '../components/product-details/Variants';
 import ProductAdditionalInfo from '../components/product-details/AdditionalInfo';
 import ImageModal from '../components/product-details/ImageModal';
+import DeleteConfirmationModal from '../components/DeleteConfirmation';
 
 const Product: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +24,7 @@ const Product: React.FC = () => {
   const [editedProduct, setEditedProduct] = useState<Product | null>(null);
   const [originalImages, setOriginalImages] = useState<string[]>([]);
   const [removedImages, setRemovedImages] = useState<string[]>([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Fetch product data
   const { isLoading, isError, data: response, error } = useQuery({
@@ -52,6 +54,27 @@ const Product: React.FC = () => {
     },
   });
 
+  // Delete product mutation
+  const deleteProductMutation = useMutation({
+    mutationFn: () => deleteProduct(id!),
+    onMutate: () => {
+      setShowDeleteModal(false);
+      toast.loading('Deleting product...', { id: 'productDelete' });
+    },
+    onSuccess: () => {
+      toast.success('Product deleted successfully!', { id: 'productDelete' });
+      queryClient.invalidateQueries({ queryKey: ['adminProducts'] });
+      queryClient.invalidateQueries({ queryKey: ['totalProducts'] });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.removeQueries({ queryKey: ['productDetail', id] });
+      window.location.href = '/products';
+    },
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || 'Failed to delete product';
+      toast.error(errorMessage, { id: 'productDelete' });
+    },
+  });
+
   // Initialize edited product
   useEffect(() => {
     if (response?.data && !editedProduct) {
@@ -59,18 +82,6 @@ const Product: React.FC = () => {
       setOriginalImages([...response.data.images]);
     }
   }, [response?.data, editedProduct]);
-
-  // Handle toast notifications (separate effect to avoid retriggering on editedProduct changes)
-  useEffect(() => {
-    if (isLoading) {
-      toast.loading('Loading product details...', { id: 'productDetail' });
-    } else if (isError) {
-      const errorMessage = (error as any)?.response?.data?.message || 'Failed to load product details!';
-      toast.error(errorMessage, { id: 'productDetail' });
-    } else if (response?.data) {
-      toast.success('Product details loaded successfully!', { id: 'productDetail' });
-    }
-  }, [isLoading, isError, response?.data, error]);
 
   // Validation function
   const validateProduct = useCallback((product: Product): string | null => {
@@ -150,6 +161,16 @@ const Product: React.FC = () => {
     toast.dismiss('productUpdate');
   }, [response?.data]);
 
+  // Handle delete product
+  const handleDeleteProduct = useCallback(() => {
+    setShowDeleteModal(true);
+  }, []);
+
+  // Handle confirm delete
+  const handleConfirmDelete = useCallback(() => {
+    deleteProductMutation.mutate();
+  }, [deleteProductMutation]);
+
   // Handle product field changes
   const handleProductChange = useCallback((field: keyof Product, value: any) => {
     setEditedProduct(prev => prev ? { ...prev, [field]: value } : null);
@@ -204,7 +225,7 @@ const Product: React.FC = () => {
   const displayProduct = isEditing ? editedProduct! : product;
   const totalStock = getTotalStock(displayProduct.variants);
   const totalVariants = displayProduct.variants.length;
-  const isPending = updateProductMutation.isPending;
+  const isPending = updateProductMutation.isPending || deleteProductMutation.isPending;
 
   return (
     <div className="min-h-screen bg-base-100 p-4">
@@ -236,7 +257,7 @@ const Product: React.FC = () => {
               className={`btn ${isEditing ? 'btn-success' : 'btn-primary'}`}
               disabled={isPending}
             >
-              {isPending ? (
+              {updateProductMutation.isPending ? (
                 <>
                   <span className="loading loading-spinner loading-sm"></span>
                   <span className="hidden sm:inline">Saving...</span>
@@ -258,12 +279,22 @@ const Product: React.FC = () => {
             </button>
             {!isEditing && (
               <button
-                onClick={() => toast('Delete functionality to be implemented')}
+                onClick={handleDeleteProduct}
                 className="btn btn-error"
                 disabled={isPending}
               >
-                <HiOutlineTrash size={16} />
-                <span className="hidden sm:inline">Delete</span>
+                {deleteProductMutation.isPending ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    <span className="hidden sm:inline">Deleting...</span>
+                    <span className="sm:hidden">...</span>
+                  </>
+                ) : (
+                  <>
+                    <HiOutlineTrash size={16} />
+                    <span className="hidden sm:inline">Delete</span>
+                  </>
+                )}
               </button>
             )}
           </div>
@@ -319,6 +350,19 @@ const Product: React.FC = () => {
           onImageSelect={setSelectedImageIndex}
           isEditing={isEditing}
           onImagesChange={handleImagesChange}
+        />
+
+        {/* Delete Confirmation Modal */}
+        <DeleteConfirmationModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={handleConfirmDelete}
+          isDeleting={deleteProductMutation.isPending}
+          itemName={product.name}
+          itemId={product._id}
+          title="Confirm Delete"
+          description={`Are you sure you want to delete "${product.name}"? The product will be permanently removed from your inventory.`}
+          confirmButtonText="Delete Product"
         />
       </div>
     </div>

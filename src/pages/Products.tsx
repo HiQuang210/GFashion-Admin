@@ -3,17 +3,17 @@ import DataTable from '../components/DataTable';
 import { fetchAdminProducts } from '../api/ApiCollection';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import AddProductData from '../components/forms/AddProductData';
 import VariantDetailsModal from '../components/products/VariantDetailsModal';
 import SummaryStatistics from '../components/products/SummaryStatistics';
 import { createProductColumns } from '../components/products/ProductColumns';
 import { getTotalStock, getTotalVariants } from '../utils/productHelper';
+import { useNavigate } from 'react-router-dom';
 
 const Products: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
+
   const [selectedProduct, setSelectedProduct] = useState<ProductWithIndex | null>(null);
   const [isVariantModalOpen, setIsVariantModalOpen] = useState(false);
-  
+  const navigate = useNavigate();
   const queryParams = {
     page: 1,
     limitItem: 50,
@@ -87,7 +87,7 @@ const Products: React.FC = () => {
             )}
           </div>
           <button
-            onClick={() => setIsOpen(true)}
+            onClick={() => navigate('/product/add')}
             className={`btn ${isLoading ? 'btn-disabled' : 'btn-primary'}`}
           >
             Add New Product +
@@ -117,14 +117,6 @@ const Products: React.FC = () => {
           isOpen={isVariantModalOpen}
           onClose={handleCloseVariantModal}
         />
-
-        {/* Add Product Modal */}
-        {isOpen && (
-          <AddProductData
-            isOpen={isOpen}
-            setIsOpen={setIsOpen}
-          />
-        )}
       </div>
     </div>
   );

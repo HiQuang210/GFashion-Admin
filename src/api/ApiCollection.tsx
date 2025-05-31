@@ -258,6 +258,50 @@ export const fetchTotalProducts = async () => {
   }
 };
 
+// CREATE PRODUCT
+export const createProduct = async (productData: Partial<Product>) => {
+  try {
+    const formData = new FormData();
+
+    if (productData.name) formData.append('name', productData.name);
+    if (productData.type) formData.append('type', productData.type);
+    if (productData.price !== undefined) formData.append('price', productData.price.toString());
+    if (productData.producer) formData.append('producer', productData.producer);
+    if (productData.description) formData.append('description', productData.description);
+    if (productData.material) formData.append('material', productData.material);
+    if (productData.rating !== undefined) formData.append('rating', productData.rating.toString());
+
+    if (productData.variants) {
+      formData.append('variants', JSON.stringify(productData.variants));
+    }
+
+    if (productData.images) {
+      const newImageFiles = productData.images.filter(img => img.startsWith('data:'));
+
+      for (let i = 0; i < newImageFiles.length; i++) {
+        const base64Image = newImageFiles[i];
+        const response = await fetch(base64Image);
+        const blob = await response.blob();
+
+        const file = new File([blob], `image_${i}.jpg`, { type: 'image/jpeg' });
+        formData.append('images', file);
+      }
+    }
+
+    const response = await apiClient.post('/product/create', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    console.log('Product created successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to create product:', error);
+    throw error;
+  }
+};
+
 // GET SINGLE PRODUCT BY ID
 export const fetchSingleProduct = async (id: string) => {
   try {
@@ -313,6 +357,34 @@ export const updateProduct = async (id: string, productData: Partial<Product>, r
     return response.data;
   } catch (error) {
     console.error('Failed to update product:', error);
+    throw error;
+  }
+};
+
+//DELETE PRODUCT(S)
+
+// DELETE SINGLE PRODUCT BY ID
+export const deleteProduct = async (id: string) => {
+  try {
+    const response = await apiClient.delete(`/product/delete/${id}`);
+    console.log('Product deleted successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to delete product:', error);
+    throw error;
+  }
+};
+
+// DELETE MULTIPLE PRODUCTS
+export const deleteMultipleProducts = async (ids: string[]) => {
+  try {
+    const response = await apiClient.delete('/product/delete', {
+      data: { ids }
+    });
+    console.log('Products deleted successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to delete products:', error);
     throw error;
   }
 };
