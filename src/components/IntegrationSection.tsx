@@ -1,5 +1,5 @@
 import React from 'react';
-import { HiOutlineTrash } from 'react-icons/hi2';
+import { HiOutlineUserMinus } from 'react-icons/hi2';
 import toast from 'react-hot-toast';
 
 type Props = {
@@ -48,35 +48,35 @@ const IntegrationSection = ({ modalRef }: Props) => {
         </div>
       </div>
 
-      {/* delete account button and modal */}
+      {/* deactivate account button and modal */}
       <div className="w-full flex justify-start items-center mt-4">
         <button
           className="btn dark:btn-neutral text-error dark:text-error text-xs xl:text-sm"
           onClick={() => modalRef.current?.showModal()}
         >
-          <HiOutlineTrash className="text-lg" />
-          Delete My Account
+          <HiOutlineUserMinus className="text-lg" />
+          Deactivate My Account
         </button>
         <dialog id="modal_delete" className="modal" ref={modalRef}>
           <div className="modal-box">
             <h3 className="font-bold text-lg dark:text-white">
-              Action Confirmation!
+              Account Deactivation
             </h3>
             <p className="py-4">
-              Do you want to delete your account? This action cannot be undone.
+              Do you want to deactivate your account? You will lose access to all features but your data will be preserved and you can reactivate later.
             </p>
             <div className="modal-action mx-0 flex-col items-stretch justify-stretch gap-3">
               <button
                 onClick={() =>
-                  toast.error('Account deletion is not allowed for admin users!')
+                  toast.error('Account deactivation is not allowed for admin users!')
                 }
                 className="btn btn-error btn-block text-base-100 dark:text-white"
               >
-                Yes, I want to delete my account
+                Yes, deactivate my account
               </button>
               <form method="dialog" className="m-0 w-full">
                 <button className="m-0 btn btn-block dark:btn-neutral">
-                  No, I don't think so
+                  No, keep my account active
                 </button>
               </form>
             </div>

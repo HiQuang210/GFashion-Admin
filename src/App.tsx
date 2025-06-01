@@ -26,6 +26,7 @@ import Login from './pages/Login';
 import Settings from './pages/Setting';
 import ProtectedRoute from './components/ProtectedRoute';
 import AddProduct from './pages/AddProduct';
+import Order from './pages/Order';
 
 function App() {
   const Layout = () => {
@@ -62,11 +63,12 @@ function App() {
       { path: '/profile/edit', element: <EditProfile /> },
       { path: '/settings', element: <Settings /> }, 
       { path: '/users', element: <Users /> },
-      { path: '/users/:id', element: <User /> },
+      { path: '/user/:id', element: <User /> },
       { path: '/products', element: <Products /> },
-      { path: '/products/:id', element: <Product /> },
+      { path: '/product/:id', element: <Product /> },
       { path: '/product/add', element: <AddProduct/> },
       { path: '/orders', element: <Orders /> },
+      { path: '/order/:id', element: <Order /> },
       { path: '/posts', element: <Posts /> },
       { path: '/notes', element: <Notes /> },
       { path: '/charts', element: <Charts /> },

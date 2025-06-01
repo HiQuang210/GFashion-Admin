@@ -1,87 +1,75 @@
 import React from 'react';
 import { GridColDef } from '@mui/x-data-grid';
-import DataTable from '../components/DataTable';
+import DataTable, { ActionConfig } from '../components/DataTable';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-// import AddData from '../components/AddData';
 import { fetchOrders } from '../api/ApiCollection';
+import { AdminOrder } from '../types/Order'; // Make sure to import the type
 
 const Orders = () => {
-  // const [isOpen, setIsOpen] = React.useState(false);
   const { isLoading, isError, isSuccess, data } = useQuery({
     queryKey: ['allorders'],
     queryFn: fetchOrders,
   });
 
   const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 90 },
-    {
-      field: 'title',
-      headerName: 'Product',
-      minWidth: 300,
-      flex: 1,
+    { 
+      field: 'id', 
+      headerName: 'ID', 
+      width: 80,
       renderCell: (params) => {
-        return (
-          <div className="flex gap-3 items-center">
-            <div className="w-6 xl:w-10 overflow-hidden flex justify-center items-center">
-              <img
-                src={params.row.product || '/corrugated-box.jpg'}
-                alt="orders-picture"
-                className="object-cover"
-              />
-            </div>
-            <span className="mb-0 pb-0 leading-none">
-              {params.row.title}
-            </span>
-          </div>
-        );
-      },
-    },
-    {
-      field: 'address',
-      type: 'string',
-      headerName: 'Address',
-      minWidth: 320,
-      flex: 1,
+        // Display incremental index starting from 1
+        const rowIndex = params.api.getRowIndexRelativeToVisibleRows(params.id);
+        return typeof rowIndex === 'number' && !isNaN(rowIndex) ? rowIndex + 1 : '-';
+      }
     },
     {
       field: 'recipient',
       headerName: 'Recipient',
       minWidth: 250,
-      flex: 1,
-      renderCell: (params) => {
-        return (
-          <div className="flex gap-3 items-center">
-            <div className="avatar">
-              <div className="w-6 xl:w-9 rounded-full">
-                <img
-                  src={
-                    params.row.profile || '/Portrait_Placeholder.png'
-                  }
-                  alt="user-picture"
-                />
-              </div>
-            </div>
-            <span className="mb-0 pb-0 leading-none">
-              {params.row.recipient}
-            </span>
-          </div>
-        );
-      },
+      flex: 1.5,
+      valueGetter: (params) => {
+        const order = params.row as AdminOrder;
+        return order.recipient || 'No recipient name';
+      }
     },
     {
-      field: 'date',
-      headerName: 'Date',
-      minWidth: 100,
+      field: 'address',
       type: 'string',
+      headerName: 'Address',
+      minWidth: 400,
+      flex: 2,
+      valueGetter: (params) => {
+        return params.row.address || 'No address provided';
+      }
+    },
+    {
+      field: 'createdAt',
+      headerName: 'Date',
+      minWidth: 140,
       flex: 1,
+      valueGetter: (params) => {
+        // Format the date
+        const date = new Date(params.row.createdAt);
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        });
+      }
     },
     {
       field: 'total',
       headerName: 'Total',
-      minWidth: 100,
-      type: 'string',
+      minWidth: 150,
       flex: 1,
+      valueGetter: (params) => {
+        // Format the total as currency (assuming VND based on the 20000/50000 shipping fees)
+        return new Intl.NumberFormat('vi-VN', {
+          style: 'currency',
+          currency: 'VND'
+        }).format(params.row.total);
+      }
     },
     {
       field: 'status',
@@ -89,67 +77,61 @@ const Orders = () => {
       minWidth: 120,
       flex: 1,
       renderCell: (params) => {
-        if (params.row.status == 'Pending') {
+        const status = params.row.status;
+        const statusConfig = {
+          pending: { color: 'warning', bgColor: 'bg-warning' },
+          Pending: { color: 'warning', bgColor: 'bg-warning' },
+          dispatch: { color: 'info', bgColor: 'bg-info' },
+          Dispatch: { color: 'info', bgColor: 'bg-info' },
+          cancelled: { color: 'error', bgColor: 'bg-error' },
+          Cancelled: { color: 'error', bgColor: 'bg-error' },
+          completed: { color: 'success', bgColor: 'bg-success' },
+          Completed: { color: 'success', bgColor: 'bg-success' },
+        };
+
+        const config = statusConfig[status as keyof typeof statusConfig];
+        
+        if (config) {
           return (
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-warning"></div>
-              <div className="text-sm font-medium text-warning">
-                {params.row.status}
+              <div className={`w-2 h-2 rounded-full ${config.bgColor}`}></div>
+              <div className={`text-sm font-medium text-${config.color} capitalize`}>
+                {status}
               </div>
-            </div>
-          );
-        } else if (params.row.status == 'Dispatch') {
-          return (
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-info"></div>
-              <div className="text-sm font-medium text-info">
-                {params.row.status}
-              </div>
-            </div>
-          );
-        } else if (params.row.status == 'Cancelled') {
-          return (
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-error"></div>
-              <div className="text-sm font-medium text-error">
-                {params.row.status}
-              </div>
-            </div>
-          );
-        } else if (params.row.status == 'Completed') {
-          return (
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-success"></div>
-              <div className="text-sm font-medium text-success">
-                {params.row.status}
-              </div>
-            </div>
-          );
-        } else {
-          return (
-            <div className="flex items-center gap-2">
-              <div className="badge bg-neutral-content badge-xs"></div>
-              <span className="text-sm font-semibold text-neutral-content">
-                Unknown
-              </span>
             </div>
           );
         }
+
+        return (
+          <div className="flex items-center gap-2">
+            <div className="badge bg-neutral-content badge-xs"></div>
+            <span className="text-sm font-semibold text-neutral-content">
+              Unknown
+            </span>
+          </div>
+        );
       },
     },
   ];
 
+  const actionConfig: ActionConfig = {
+    showEdit: true,
+    showDelete: false, 
+    editRoute: (id: string) => `/order/${id}`,
+    getItemName: (row: any) => `Order #${row.id}` || 'Order'
+  };
+
   React.useEffect(() => {
     if (isLoading) {
-      toast.loading('Loading...', { id: 'promiseOrders' });
+      toast.loading('Loading orders...', { id: 'promiseOrders' });
     }
     if (isError) {
-      toast.error('Error while getting the data!', {
+      toast.error('Error while getting the orders!', {
         id: 'promiseOrders',
       });
     }
     if (isSuccess) {
-      toast.success('Got the data successfully!', {
+      toast.success('Orders loaded successfully!', {
         id: 'promiseOrders',
       });
     }
@@ -169,50 +151,21 @@ const Orders = () => {
               </span>
             )}
           </div>
-          {/* <button
-            onClick={() => setIsOpen(true)}
-            className={`btn ${
-              isLoading ? 'btn-disabled' : 'btn-primary'
-            }`}
-          >
-            Add New Order +
-          </button> */}
         </div>
-        {isLoading ? (
-          <DataTable
-            slug="orders"
-            columns={columns}
-            rows={[]}
-            includeActionColumn={false}
-          />
-        ) : isSuccess ? (
-          <DataTable
-            slug="orders"
-            columns={columns}
-            rows={data}
-            includeActionColumn={false}
-          />
-        ) : (
-          <>
-            <DataTable
-              slug="orders"
-              columns={columns}
-              rows={[]}
-              includeActionColumn={false}
-            />
-            <div className="w-full flex justify-center">
-              Error while getting the data!
-            </div>
-          </>
-        )}
 
-        {/* {isOpen && (
-          <AddData
-            slug={'user'}
-            isOpen={isOpen}
-            setIsOpen={setIsOpen}
-          />
-        )} */}
+        <DataTable
+          slug="orders"
+          columns={columns}
+          rows={isSuccess ? data || [] : []}
+          includeActionColumn={true}
+          actionConfig={actionConfig}
+        />
+
+        {isError && !isLoading && (
+          <div className="w-full flex justify-center text-error">
+            Error while getting the orders data!
+          </div>
+        )}
       </div>
     </div>
   );

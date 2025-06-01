@@ -19,12 +19,12 @@ export const createProductColumns = (
     minWidth: 300,
     flex: 1,
     renderCell: (params) => (
-      <div className="flex gap-3 items-center">
-        <div className="w-6 xl:w-10 overflow-hidden flex justify-center items-center">
+      <div className="flex gap-3 items-center py-2">
+        <div className="w-8 xl:w-12 h-8 xl:h-12 overflow-hidden flex justify-center items-center rounded-md">
           <img
             src={params.row.images?.[0] || '/corrugated-box.jpg'}
             alt="product-picture"
-            className="object-cover"
+            className="object-cover w-full h-full"
           />
         </div>
         <span className="mb-0 pb-0 leading-none">{params.row.name}</span>

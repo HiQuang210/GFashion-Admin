@@ -389,6 +389,41 @@ export const deleteMultipleProducts = async (ids: string[]) => {
   }
 };
 
+
+// GET ALL ORDERS
+export const fetchOrders = async () => {
+  try {
+    const response = await apiClient.get('/order/admin-get-all');
+    console.log('fetchOrders response:', response.data);
+    
+    if (response.data.status === 'OK') {
+      return response.data.data; 
+    } else {
+      throw new Error(response.data.message || 'Failed to fetch orders');
+    }
+  } catch (error: any) {
+    console.error('fetchOrders error:', error);
+    throw error;
+  }
+};
+
+// GET ORDER BY ID FOR ADMIN
+export const fetchOrderById = async (orderId: string) => {
+  try {
+    const response = await apiClient.get(`/order/admin-get-detail/${orderId}`);
+    console.log('fetchOrderById response:', response.data);
+    
+    if (response.data.status === 'OK') {
+      return response.data.data;
+    } else {
+      throw new Error(response.data.message || 'Failed to fetch order details');
+    }
+  } catch (error: any) {
+    console.error('fetchOrderById error:', error);
+    throw error;
+  }
+};
+
 // GET TOTAL RATIO
 export const fetchTotalRatio = async () => {
   const response = await axios
@@ -491,22 +526,6 @@ export const fetchTotalRevenueByProducts = async () => {
 export const fetchTotalProfit = async () => {
   const response = await axios
     .get('https://react-admin-ui-v1-api.vercel.app/totalprofit')
-    .then((res) => {
-      console.log('axios get:', res.data);
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-      throw err;
-    });
-
-  return response;
-};
-
-// GET ALL ORDERS
-export const fetchOrders = async () => {
-  const response = await axios
-    .get('https://react-admin-ui-v1-api.vercel.app/orders')
     .then((res) => {
       console.log('axios get:', res.data);
       return res.data;

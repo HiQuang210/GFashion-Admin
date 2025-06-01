@@ -91,12 +91,18 @@ const Profile = () => {
               <div className="col-span-1 flex flex-col xl:gap-5">
                 <span>Email*</span>
                 <span>Phone</span>
-                <span>Address</span>
+                <span>Member Since</span>
               </div>
               <div className="col-span-2 flex flex-col xl:gap-5">
                 <span className="font-semibold">{user.email}</span>
                 <span className="font-semibold">{user.phone || 'Not provided'}</span>
-                <span className="font-semibold">{user.address || 'Not provided'}</span>
+                <span className="font-semibold text-sm">
+                  {new Date(user.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </span>
               </div>
             </div>
 
@@ -105,7 +111,6 @@ const Profile = () => {
               <div className="col-span-1 flex flex-col xl:gap-5">
                 <span>Password</span>
                 <span>Account Status</span>
-                <span>Member Since</span>
               </div>
               <div className="col-span-2 flex flex-col xl:gap-5">
                 <span
@@ -116,13 +121,6 @@ const Profile = () => {
                 </span>
                 <span className={`font-semibold ${user.isActive ? 'text-success' : 'text-error'}`}>
                   {user.isActive ? 'Active' : 'Inactive'}
-                </span>
-                <span className="font-semibold text-sm">
-                  {new Date(user.createdAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
                 </span>
               </div>
             </div>

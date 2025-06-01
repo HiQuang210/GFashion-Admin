@@ -105,7 +105,6 @@ const AddProduct: React.FC = () => {
         })
       };
 
-      // Remove variant _id if it's temporary
       if (variant._id.startsWith('temp-')) {
         delete cleanedVariant._id;
       }

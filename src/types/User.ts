@@ -8,7 +8,6 @@ export interface User {
   isActive: boolean;
   isAdmin: boolean;
   phone?: string;
-  address?: string;
   favorite: string[]; 
   cart: {
     product: string; 

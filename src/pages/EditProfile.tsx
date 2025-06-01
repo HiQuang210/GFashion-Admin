@@ -18,8 +18,7 @@ const EditProfile = () => {
     firstName: '',
     lastName: '',
     email: '',
-    phone: '',
-    address: ''
+    phone: ''
   });
 
   useEffect(() => {
@@ -28,8 +27,7 @@ const EditProfile = () => {
         firstName: user.firstName || '',
         lastName: user.lastName || '',
         email: user.email || '',
-        phone: user.phone || '',
-        address: user.address || ''
+        phone: user.phone || ''
       });
       setPreview(user.img || '');
     }
@@ -107,8 +105,7 @@ const EditProfile = () => {
     { label: 'First Name', key: 'firstName', type: 'text', required: true },
     { label: 'Last Name', key: 'lastName', type: 'text', required: true },
     { label: 'Email', key: 'email', type: 'email', required: true },
-    { label: 'Phone', key: 'phone', type: 'tel', required: false },
-    { label: 'Address', key: 'address', type: 'textarea', required: false }
+    { label: 'Phone', key: 'phone', type: 'tel', required: false }
   ];
 
   return (
@@ -185,26 +182,15 @@ const EditProfile = () => {
                   {field.label}
                   {field.required && <span className="text-error ml-1">*</span>}
                 </label>
-                {field.type === 'textarea' ? (
-                  <textarea
-                    className="textarea textarea-bordered w-full"
-                    value={formData[field.key as keyof typeof formData]}
-                    onChange={handleChange(field.key)}
-                    placeholder={field.label}
-                    disabled={isUpdating}
-                    rows={3}
-                  />
-                ) : (
-                  <input
-                    type={field.type}
-                    className="input input-bordered w-full"
-                    value={formData[field.key as keyof typeof formData]}
-                    onChange={handleChange(field.key)}
-                    placeholder={field.label}
-                    disabled={isUpdating || field.key === 'email'}
-                    required={field.required}
-                  />
-                )}
+                <input
+                  type={field.type}
+                  className="input input-bordered w-full"
+                  value={formData[field.key as keyof typeof formData]}
+                  onChange={handleChange(field.key)}
+                  placeholder={field.label}
+                  disabled={isUpdating || field.key === 'email'}
+                  required={field.required}
+                />
               </div>
             ))}
           </div>

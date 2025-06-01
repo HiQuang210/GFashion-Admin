@@ -9,7 +9,7 @@ const Error = () => {
       <div className="w-full h-full flex justify-center items-center">
         <div className="flex flex-col justify-center items-center gap-10">
           <h1 className="font-bold text-7xl">
-            🐔 Boom! Are you lost? 🙄
+            🐔 Oops! It was 404. 🐸
           </h1>
           <button onClick={() => navigate('/')} className="btn">
             <HiOutlineHome className="xl:text-2xl" />

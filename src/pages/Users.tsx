@@ -1,6 +1,6 @@
 import React from 'react';
 import { GridColDef } from '@mui/x-data-grid';
-import DataTable from '../components/DataTable';
+import DataTable, { ActionConfig } from '../components/DataTable';
 import { fetchUsers } from '../api/ApiCollection';
 import { useQuery } from '@tanstack/react-query';
 //import toast from 'react-hot-toast';
@@ -46,9 +46,9 @@ const Users = () => {
       minWidth: 220,
       flex: 1,
       renderCell: ({ row }) => (
-        <div className="flex gap-3 items-center">
+        <div className="flex gap-3 items-center py-2">
           <div className="avatar">
-            <div className="w-6 xl:w-9 rounded-full">
+            <div className="w-8 xl:w-10 rounded-full">
               <img src={row.img || '/Portrait_Placeholder.png'} alt="user" />
             </div>
           </div>
@@ -93,6 +93,13 @@ const Users = () => {
     },
   ];
 
+  const actionConfig: ActionConfig = {
+    showEdit: true,
+    showDelete: false, 
+    editRoute: (id: string) => `/user/${id}`,
+    getItemName: (row: any) => `${row.firstName} ${row.lastName}` || 'User'
+  };
+
   // React.useEffect(() => {
   //   const toastId = 'promiseUsers';
   //   if (isLoading) toast.loading('Loading...', { id: toastId });
@@ -127,6 +134,7 @@ const Users = () => {
           columns={columns}
           rows={isSuccess ? users : []}
           includeActionColumn={true}
+          actionConfig={actionConfig}
         />
 
         {isError && !isLoading && (

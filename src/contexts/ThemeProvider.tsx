@@ -8,14 +8,35 @@ interface ThemeProviderProps {
 const ThemeProvider: React.FC<ThemeProviderProps> = ({
   children,
 }) => {
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState(() => {
+    try {
+      const savedTheme = localStorage.getItem('theme');
+      return savedTheme || 'light';
+    } catch (error) {
+      console.warn('localStorage not available, using default theme');
+      return 'light';
+    }
+  });
 
   const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    
+    try {
+      localStorage.setItem('theme', newTheme);
+    } catch (error) {
+      console.warn('Could not save theme to localStorage');
+    }
   };
 
   useEffect(() => {
     document.querySelector('html')?.setAttribute('data-theme', theme);
+    
+    try {
+      localStorage.setItem('theme', theme);
+    } catch (error) {
+      console.warn('Could not save theme to localStorage');
+    }
   }, [theme]);
 
   return (
