@@ -1,10 +1,10 @@
 import React from 'react';
 import { GridColDef } from '@mui/x-data-grid';
-import DataTable, { ActionConfig } from '../components/DataTable';
+import DataTable, { ActionConfig } from '@components/DataTable';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { fetchOrders } from '../api/ApiCollection';
-import { AdminOrder } from '../types/Order'; // Make sure to import the type
+import { fetchOrders } from '@api/ApiCollection';
+import { AdminOrder } from '@type/Order'; 
 
 const Orders = () => {
   const { isLoading, isError, isSuccess, data } = useQuery({

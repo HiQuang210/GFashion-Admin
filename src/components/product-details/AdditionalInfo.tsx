@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatDate } from '../../utils/productHelper';
+import { formatDate } from '@utils/productHelper';
 import { HiOutlineCalendar } from 'react-icons/hi2';
 
 interface ProductAdditionalInfoProps {

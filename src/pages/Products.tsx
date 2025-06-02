@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import DataTable, { ActionConfig } from '../components/DataTable';
-import { fetchAdminProducts, deleteProduct, deleteMultipleProducts } from '../api/ApiCollection';
+import DataTable, { ActionConfig } from '@components/DataTable';
+import { fetchAdminProducts, deleteProduct, deleteMultipleProducts } from '@api/ApiCollection';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import VariantDetailsModal from '../components/products/VariantDetailsModal';
-import SummaryStatistics from '../components/products/SummaryStatistics';
-import { createProductColumns } from '../components/products/ProductColumns';
-import { getTotalStock, getTotalVariants } from '../utils/productHelper';
+import VariantDetailsModal from '@components/products/VariantDetailsModal';
+import SummaryStatistics from '@components/products/SummaryStatistics';
+import { createProductColumns } from '@components/products/ProductColumns';
+import { getTotalStock, getTotalVariants } from '@utils/productHelper';
 import { useNavigate } from 'react-router-dom';
 import { HiOutlineTrash } from 'react-icons/hi2';
-import DeleteConfirmationModal from '../components/DeleteConfirmation';
+import DeleteConfirmationModal from '@components/DeleteConfirmation';
 
 const Products: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<ProductWithIndex | null>(null);

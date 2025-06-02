@@ -1,17 +1,17 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchSingleProduct, updateProduct, deleteProduct } from '../api/ApiCollection';
-import { getTotalStock } from '../utils/productHelper';
+import { fetchSingleProduct, updateProduct, deleteProduct } from '@api/ApiCollection';
+import { getTotalStock } from '@utils/productHelper';
 import toast from 'react-hot-toast';
 import { HiOutlineArrowLeft, HiOutlinePencilSquare, HiOutlineTrash, HiOutlineCheck } from 'react-icons/hi2';
-import ProductImageGallery from '../components/product-details/ImageGallery';
-import ProductBasicInfo from '../components/product-details/BasicInfo';
-import ProductStockStats from '../components/product-details/StockStat';
-import ProductVariants from '../components/product-details/Variants';
-import ProductAdditionalInfo from '../components/product-details/AdditionalInfo';
-import ImageModal from '../components/product-details/ImageModal';
-import DeleteConfirmationModal from '../components/DeleteConfirmation';
+import ProductImageGallery from '@components/product-details/ImageGallery';
+import ProductBasicInfo from '@components/product-details/BasicInfo';
+import ProductStockStats from '@components/product-details/StockStat';
+import ProductVariants from '@components/product-details/Variants';
+import ProductAdditionalInfo from '@components/product-details/AdditionalInfo';
+import ImageModal from '@components/product-details/ImageModal';
+import DeleteConfirmationModal from '@components/DeleteConfirmation';
 
 const Product: React.FC = () => {
   const { id } = useParams<{ id: string }>();

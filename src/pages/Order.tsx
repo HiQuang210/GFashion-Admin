@@ -16,8 +16,8 @@ import {
   HiExclamationCircle,
   HiPhone
 } from 'react-icons/hi2';
-import { AdminOrder, OrderProduct } from '../types/Order';
-import { fetchOrderById } from '../api/ApiCollection'; // Add this import
+import { AdminOrder, OrderProduct } from '@type/Order';
+import { fetchOrderById } from '@api/ApiCollection'; 
 
 const Order = () => {
   const { id } = useParams<{ id: string }>();
@@ -47,7 +47,7 @@ const Order = () => {
         return <HiCheckCircle className="w-5 h-5 text-success" />;
       case 'pending':
         return <HiClock className="w-5 h-5 text-warning" />;
-      case 'dispatch':
+      case 'processing':
         return <HiTruck className="w-5 h-5 text-info" />;
       case 'cancelled':
         return <HiXCircle className="w-5 h-5 text-error" />;
@@ -60,7 +60,7 @@ const Order = () => {
     const statusConfig = {
       pending: 'badge-warning',
       completed: 'badge-success',
-      dispatch: 'badge-info',
+      processing: 'badge-info',
       cancelled: 'badge-error',
     };
     
@@ -332,7 +332,7 @@ const Order = () => {
                 
                 {/* Total */}
                 <div className="flex justify-between text-lg font-bold">
-                  <span>Total Amount</span>
+                  <span>Total Amount:</span>
                   <span className="text-primary">{formatCurrency(order.total)}</span>
                 </div>
               </div>

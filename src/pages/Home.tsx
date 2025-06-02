@@ -1,6 +1,6 @@
 // import React from 'react';
-import TopDealsBox from '../components/topDealsBox/TopDealsBox';
-import ChartBox from '../components/charts/ChartBox';
+import TopDealsBox from '@components/topDealsBox/TopDealsBox';
+import ChartBox from '@components/charts/ChartBox';
 import { useQuery } from '@tanstack/react-query';
 import {
   MdGroup,
@@ -17,7 +17,7 @@ import {
   fetchTotalSource,
   fetchTotalUsers,
   fetchTotalVisit,
-} from '../api/ApiCollection';
+} from '@api/ApiCollection';
 
 const Home = () => {
   const queryGetTotalUsers = useQuery({

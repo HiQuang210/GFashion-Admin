@@ -1,6 +1,6 @@
 import axios, { AxiosResponse, AxiosError } from 'axios';
-import { getCookie, deleteCookie } from '../utils/cookieUtils';
-import { CreateUserData, User } from '../types/User'; 
+import { getCookie, deleteCookie } from '@utils/cookieUtils';
+import { CreateUserData, User } from '@type/User'; 
 
 const API_BASE_URL = 'http://localhost:5000/api';
 

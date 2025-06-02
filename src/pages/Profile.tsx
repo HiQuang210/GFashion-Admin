@@ -1,9 +1,9 @@
 import React from 'react';
 import { HiOutlinePencil } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
-import ChangePassword from '../components/forms/ChangePassword';
-import IntegrationSection from '../components/IntegrationSection';
+import { useAuth } from '@hooks/useAuth';
+import ChangePassword from '@components/forms/ChangePassword';
+import IntegrationSection from '@components/IntegrationSection';
 
 const Profile = () => {
   const modalDelete = React.useRef<HTMLDialogElement>(null);

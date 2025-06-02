@@ -1,9 +1,9 @@
 import React from 'react';
 import { GridColDef } from '@mui/x-data-grid';
-import DataTable from '../components/DataTable';
+import DataTable from '@components/DataTable';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { fetchLogs } from '../api/ApiCollection';
+import { fetchLogs } from '@api/ApiCollection';
 
 const Logs = () => {
   const { isLoading, isError, isSuccess, data } = useQuery({

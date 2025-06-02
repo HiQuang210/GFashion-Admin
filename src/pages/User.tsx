@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useQuery } from '@tanstack/react-query';
-import { fetchSingleUser, updateUserByAdmin } from '../api/ApiCollection';
+import { fetchSingleUser, updateUserByAdmin } from '@api/ApiCollection';
 import { ArrowLeft } from 'lucide-react';
 
 const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;

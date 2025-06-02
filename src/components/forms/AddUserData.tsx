@@ -3,8 +3,8 @@ import toast from 'react-hot-toast';
 import { HiOutlineXMark } from 'react-icons/hi2';
 import { PiEyeBold, PiEyeClosedBold } from 'react-icons/pi';
 import { useNavigate } from 'react-router-dom';
-import { registerUser } from '../../api/ApiCollection'; 
-import { useModalTransition } from '../../hooks/useModalTransition';
+import { registerUser } from '@api/ApiCollection'; 
+import { useModalTransition } from '@hooks/useModalTransition';
 
 interface AddUserDataProps {
   isOpen: boolean;

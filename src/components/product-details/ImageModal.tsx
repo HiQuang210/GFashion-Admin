@@ -8,7 +8,7 @@ import {
   createDeleteButton,
   getThumbnailClasses,
   MAX_IMAGES
-} from '../ImageHandler';
+} from '@components/ImageHandler';
 
 const ImageModal: React.FC<ImageModalProps> = ({
   isOpen,

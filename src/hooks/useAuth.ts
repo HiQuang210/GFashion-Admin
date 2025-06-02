@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCookie, deleteCookie } from '../utils/cookieUtils';
-import { User } from '../types/User';
-import { fetchSingleUser } from '../api/ApiCollection';
+import { getCookie, deleteCookie } from '@utils/cookieUtils';
+import { User } from '@type/User';
+import { fetchSingleUser } from '@api/ApiCollection';
 
 interface UseAuthReturn {
   user: User | null;

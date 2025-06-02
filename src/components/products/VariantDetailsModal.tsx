@@ -1,7 +1,7 @@
 import React from 'react';
 import { Package } from 'lucide-react';
-import { formatPrice, getTotalStock } from '../../utils/productHelper';
-import { useModalTransition } from '../../hooks/useModalTransition';
+import { formatPrice, getTotalStock } from '@utils/productHelper';
+import { useModalTransition } from '@hooks/useModalTransition';
 
 interface VariantDetailsModalProps {
   product: ProductWithIndex | null;

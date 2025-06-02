@@ -2,9 +2,9 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { HiOutlinePencil } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
-import IntegrationSection from '../components/IntegrationSection';
-import { updateUser } from '../api/ApiCollection';
+import { useAuth } from '@hooks/useAuth';
+import IntegrationSection from '@components/IntegrationSection';
+import { updateUser } from '@api/ApiCollection';
 
 const EditProfile = () => {
   const modalDelete = useRef<HTMLDialogElement>(null);

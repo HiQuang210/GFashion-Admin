@@ -1,13 +1,13 @@
 import React from 'react';
 import { GridColDef } from '@mui/x-data-grid';
-import DataTable, { ActionConfig } from '../components/DataTable';
-import { fetchUsers } from '../api/ApiCollection';
+import DataTable, { ActionConfig } from '@components/DataTable';
+import { fetchUsers } from '@api/ApiCollection';
 import { useQuery } from '@tanstack/react-query';
 //import toast from 'react-hot-toast';
-import AddUserData from '../components/forms/AddUserData';
+import AddUserData from '@components/forms/AddUserData';
 import { HiCheck, HiX } from 'react-icons/hi';
-import { User } from '../types/User';
-import { useAuth } from '../hooks/useAuth';
+import { User } from '@type/User';
+import { useAuth } from '@hooks/useAuth';
 
 const Users = () => {
   const [isOpen, setIsOpen] = React.useState(false);

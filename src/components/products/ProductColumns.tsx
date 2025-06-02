@@ -1,6 +1,6 @@
 import { GridColDef } from '@mui/x-data-grid';
 import { Package } from 'lucide-react';
-import { formatDate, formatPrice, getTotalStock } from '../../utils//productHelper';
+import { formatDate, formatPrice, getTotalStock } from '@utils/productHelper';
 import VariantSummaryCell from './VariantSummaryCell';
 
 export const createProductColumns = (

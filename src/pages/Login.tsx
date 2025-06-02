@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import ChangeThemes from '../components/ChangesThemes';
+import ChangeThemes from '@components/ChangesThemes';
 import { DiReact } from 'react-icons/di';
 import { useNavigate } from 'react-router-dom';
-import { adminLoginUser } from '../api/ApiCollection';
-import { setCookie } from '../utils/cookieUtils';
+import { adminLoginUser } from '@api/ApiCollection';
+import { setCookie } from '@utils/cookieUtils';
 
 const Login = () => {
   const navigate = useNavigate();

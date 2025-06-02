@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import { menu, settingsMenuItem } from './menu/data'; 
 import MenuItem from './menu/MenuItem';
 import FullscreenToggle from './FullscreenToggle';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '@hooks/useAuth';
 
 const Navbar: React.FC = () => {
   const [isDrawerOpen, setDrawerOpen] = React.useState(false);

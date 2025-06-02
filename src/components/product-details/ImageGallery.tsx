@@ -9,7 +9,7 @@ import {
   getThumbnailClasses,
   createEmptyImagePlaceholder,
   MAX_IMAGES
-} from '../ImageHandler';
+} from '@components/ImageHandler';
 
 const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
   images,

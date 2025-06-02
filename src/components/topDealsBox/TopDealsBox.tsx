@@ -2,7 +2,7 @@
 import toast from 'react-hot-toast';
 // import { topDealUsers } from './data';
 import { useQuery } from '@tanstack/react-query';
-import { fetchTopDeals } from '../../api/ApiCollection';
+import { fetchTopDeals } from '@api/ApiCollection';
 
 interface topDealsUser {
   id: number;

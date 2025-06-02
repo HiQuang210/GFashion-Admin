@@ -1,14 +1,14 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createProduct } from '../api/ApiCollection';
+import { createProduct } from '@api/ApiCollection';
 import toast from 'react-hot-toast';
 import { HiOutlineArrowLeft, HiOutlinePlus } from 'react-icons/hi2';
-import ProductImageGallery from '../components/product-details/ImageGallery';
-import ProductBasicInfo from '../components/product-details/BasicInfo';
-import ProductVariants from '../components/product-details/Variants';
-import ProductAdditionalInfo from '../components/product-details/AdditionalInfo';
-import ImageModal from '../components/product-details/ImageModal';
+import ProductImageGallery from '@components/product-details/ImageGallery';
+import ProductBasicInfo from '@components/product-details/BasicInfo';
+import ProductVariants from '@components/product-details/Variants';
+import ProductAdditionalInfo from '@components/product-details/AdditionalInfo';
+import ImageModal from '@components/product-details/ImageModal';
 
 const AddProduct: React.FC = () => {
   const navigate = useNavigate();

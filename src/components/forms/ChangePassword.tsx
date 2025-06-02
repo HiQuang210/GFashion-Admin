@@ -2,7 +2,7 @@ import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { HiOutlineXMark } from 'react-icons/hi2';
 import { PiEyeBold, PiEyeClosedBold } from 'react-icons/pi';
-import { changePassword } from '../../api/ApiCollection';
+import { changePassword } from '@api/ApiCollection';
 
 interface ChangePasswordProps {
   isOpen: boolean;
