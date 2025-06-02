@@ -25,6 +25,15 @@ interface FetchAdminProductsParams {
   searchQuery?: string;
 }
 
+interface UpdateOrderStatusResponse {
+  status: string;
+  message: string;
+  data: {
+    id: string;
+    status: string;
+  };
+}
+
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
 });
@@ -92,17 +101,6 @@ export const adminLoginUser = async (credentials: LoginCredentials): Promise<Log
   } catch (error) {
     console.error('Admin login error:', error);
     throw error;
-  }
-};
-
-// GET TOTAL USERS (excluding current user)
-export const fetchTotalUsers = async () => {
-  try {
-    const response = await apiClient.get('/user/getAll');
-    return response.data.totalUser; 
-  } catch (err) {
-    console.error('Failed to fetch total users:', err);
-    throw err;
   }
 };
 
@@ -389,7 +387,6 @@ export const deleteMultipleProducts = async (ids: string[]) => {
   }
 };
 
-
 // GET ALL ORDERS
 export const fetchOrders = async () => {
   try {
@@ -424,20 +421,21 @@ export const fetchOrderById = async (orderId: string) => {
   }
 };
 
-// GET TOTAL RATIO
-export const fetchTotalRatio = async () => {
-  const response = await axios
-    .get('https://react-admin-ui-v1-api.vercel.app/totalratio')
-    .then((res) => {
-      console.log('axios get:', res.data);
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-      throw err;
-    });
-
-  return response;
+// UPDATE ORDER STATUS
+export const updateOrderStatus = async (orderId: string, status: string): Promise<UpdateOrderStatusResponse> => {
+  try {
+    const response = await apiClient.put(`/order/update-status/${orderId}?status=${status}`);
+    console.log('updateOrderStatus response:', response.data);
+    
+    if (response.data.status === 'OK') {
+      return response.data;
+    } else {
+      throw new Error(response.data.message || 'Failed to update order status');
+    }
+  } catch (error: any) {
+    console.error('updateOrderStatus error:', error);
+    throw error;
+  }
 };
 
 // GET TOTAL REVENUE
@@ -460,22 +458,6 @@ export const fetchTotalRevenue = async () => {
 export const fetchTotalSource = async () => {
   const response = await axios
     .get('https://react-admin-ui-v1-api.vercel.app/totalsource')
-    .then((res) => {
-      console.log('axios get:', res.data);
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-      throw err;
-    });
-
-  return response;
-};
-
-// GET TOTAL VISIT
-export const fetchTotalVisit = async () => {
-  const response = await axios
-    .get('https://react-admin-ui-v1-api.vercel.app/totalvisit')
     .then((res) => {
       console.log('axios get:', res.data);
       return res.data;

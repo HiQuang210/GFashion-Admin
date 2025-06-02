@@ -9,6 +9,7 @@ export interface User {
   isAdmin: boolean;
   phone?: string;
   favorite: string[]; 
+  totalSpent: number;
   cart: {
     product: string; 
     color: string;

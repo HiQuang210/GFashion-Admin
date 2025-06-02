@@ -1,38 +1,30 @@
-// import React from 'react';
-import TopDealsBox from '@components/topDealsBox/TopDealsBox';
+import TopSpendingBox from '@components/dashboard/TopSpendingBox';
 import ChartBox from '@components/charts/ChartBox';
 import { useQuery } from '@tanstack/react-query';
 import {
   MdGroup,
   MdInventory2,
-  MdAssessment,
   MdSwapHorizontalCircle,
 } from 'react-icons/md';
 import {
+  fetchUsers, // Updated import
   fetchTotalProducts,
   fetchTotalProfit,
-  fetchTotalRatio,
   fetchTotalRevenue,
   fetchTotalRevenueByProducts,
-  fetchTotalSource,
-  fetchTotalUsers,
-  fetchTotalVisit,
+  fetchTotalSource
 } from '@api/ApiCollection';
 
 const Home = () => {
-  const queryGetTotalUsers = useQuery({
-    queryKey: ['totalusers'],
-    queryFn: fetchTotalUsers,
+  // Updated query to use fetchUsers instead of fetchTotalUsers
+  const queryGetUsers = useQuery({
+    queryKey: ['users'],
+    queryFn: fetchUsers,
   });
 
   const queryGetTotalProducts = useQuery({
     queryKey: ['totalproducts'],
     queryFn: fetchTotalProducts,
-  });
-
-  const queryGetTotalRatio = useQuery({
-    queryKey: ['totalratio'],
-    queryFn: fetchTotalRatio,
   });
 
   const queryGetTotalRevenue = useQuery({
@@ -50,15 +42,44 @@ const Home = () => {
     queryFn: fetchTotalRevenueByProducts,
   });
 
-  const queryGetTotalVisit = useQuery({
-    queryKey: ['totalvisit'],
-    queryFn: fetchTotalVisit,
-  });
-
   const queryGetTotalProfit = useQuery({
     queryKey: ['totalprofit'],
     queryFn: fetchTotalProfit,
   });
+
+  // Transform users data to match ChartBox expected format
+  const transformUsersData = () => {
+    if (!queryGetUsers.data || !queryGetUsers.data.data) {
+      return {
+        number: 0,
+        percentage: 0,
+        chartData: []
+      };
+    }
+
+    const responseData = queryGetUsers.data;
+    const users = responseData.data; // Access the nested data array
+    const totalUsers = responseData.totalUser; // Use the totalUser field from API
+
+    // Create sample chart data based on user registration dates or other metrics
+    // You can modify this based on your actual data structure
+    const chartData = users.map((index: number) => ({
+      name: `User ${index + 1}`,
+      value: 1 // You can replace this with actual user metrics
+    }));
+
+    // Calculate percentage growth (you can implement your own logic here)
+    // For example, comparing with previous period or target
+    const percentage = totalUsers > 0 ? 10 : 0; // Placeholder percentage
+
+    return {
+      number: totalUsers,
+      percentage: percentage,
+      chartData: chartData
+    };
+  };
+
+  const usersData = transformUsersData();
 
   return (
     // screen
@@ -66,16 +87,18 @@ const Home = () => {
       {/* grid */}
       <div className="w-full grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 grid-flow-dense auto-rows-[minmax(200px,auto)] xl:auto-rows-[minmax(150px,auto)] gap-3 xl:gap-3 px-0">
         <div className="box col-span-full sm:col-span-1 xl:col-span-1 row-span-3 3xl:row-span-5">
-          <TopDealsBox />
+          <TopSpendingBox />
         </div>
         <div className="box col-span-full sm:col-span-1 xl:col-span-1 3xl:row-span-2">
           <ChartBox
             chartType={'line'}
             IconBox={MdGroup}
             title="Total Users"
-            {...queryGetTotalUsers.data}
-            isLoading={queryGetTotalUsers.isLoading}
-            isSuccess={queryGetTotalUsers.isSuccess}
+            number={usersData.number}
+            percentage={usersData.percentage}
+            chartData={usersData.chartData}
+            isLoading={queryGetUsers.isLoading}
+            isSuccess={queryGetUsers.isSuccess}
           />
         </div>
         <div className="box col-span-full sm:col-span-1 xl:col-span-1 3xl:row-span-2">
@@ -100,16 +123,6 @@ const Home = () => {
         <div className="box col-span-full sm:col-span-1 xl:col-span-1 3xl:row-span-2">
           <ChartBox
             chartType={'line'}
-            IconBox={MdAssessment}
-            title="Total Ratio"
-            {...queryGetTotalRatio.data}
-            isLoading={queryGetTotalRatio.isLoading}
-            isSuccess={queryGetTotalRatio.isSuccess}
-          />
-        </div>
-        <div className="box col-span-full sm:col-span-1 xl:col-span-1 3xl:row-span-2">
-          <ChartBox
-            chartType={'line'}
             IconBox={MdSwapHorizontalCircle}
             title="Total Revenue"
             {...queryGetTotalRevenue.data}
@@ -124,15 +137,6 @@ const Home = () => {
             {...queryGetTotalRevenueByProducts.data}
             isLoading={queryGetTotalRevenueByProducts.isLoading}
             isSuccess={queryGetTotalRevenueByProducts.isSuccess}
-          />
-        </div>
-        <div className="box col-span-full sm:col-span-1 xl:col-span-1 3xl:row-span-2">
-          <ChartBox
-            chartType={'bar'}
-            title="Total Visit"
-            {...queryGetTotalVisit.data}
-            isLoading={queryGetTotalVisit.isLoading}
-            isSuccess={queryGetTotalVisit.isSuccess}
           />
         </div>
         <div className="box col-span-full sm:col-span-1 xl:col-span-1 3xl:row-span-2">

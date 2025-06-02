@@ -1,6 +1,7 @@
 import { 
   HiCheckCircle,
   HiClock,
+  HiCube,
   HiTruck,
   HiXCircle,
   HiExclamationCircle
@@ -9,17 +10,17 @@ import {
 export const getStatusIcon = (status: string) => {
   switch (status.toLowerCase()) {
     case 'completed':
-      return <HiCheckCircle className="w-4 h-4 text-success" />;
+      return <HiCheckCircle className="w-4 h-4 text-black-content" />;
     case 'pending':
-      return <HiClock className="w-4 h-4 text-warning" />;
+      return <HiClock className="w-4 h-4 text-black-content" />;
     case 'processing':
-      return <HiTruck className="w-4 h-4 text-info" />;
+      return <HiCube className="w-4 h-4 text-black-content" />;
     case 'shipping':
-      return <HiTruck className="w-4 h-4 text-primary" />;
+      return <HiTruck className="w-4 h-4 text-black-content" />;
     case 'cancelled':
-      return <HiXCircle className="w-4 h-4 text-error" />;
+      return <HiXCircle className="w-4 h-4 text-black-content" />;
     default:
-      return <HiExclamationCircle className="w-4 h-4 text-neutral" />;
+      return <HiExclamationCircle className="w-4 h-4 text-black-content" />;
   }
 };
 

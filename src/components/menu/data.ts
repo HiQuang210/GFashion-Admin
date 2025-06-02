@@ -3,7 +3,7 @@ import {
   HiOutlineUsers,
   HiOutlineCube,
   HiOutlineClipboardDocumentList,
-  HiOutlineDocumentChartBar,
+  HiOutlineStar,
   HiOutlinePencilSquare,
   HiOutlinePresentationChartBar,
 } from 'react-icons/hi2';
@@ -39,9 +39,9 @@ export const menu = [
       },
       {
         isLink: true,
-        url: '/posts',
-        icon: HiOutlineDocumentChartBar,
-        label: 'posts',
+        url: '/reviews',
+        icon: HiOutlineStar,
+        label: 'reviews',
       },
     ],
   },

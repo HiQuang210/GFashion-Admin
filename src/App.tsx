@@ -14,7 +14,6 @@ import Menu from './components/menu/Menu';
 import Error from './pages/Error';
 import Profile from './pages/Profile';
 import Orders from './pages/Orders';
-import Posts from './pages/Posts';
 import Notes from './pages/Notes';
 import Charts from './pages/Charts';
 import Logs from './pages/Logs';
@@ -69,7 +68,6 @@ function App() {
       { path: '/product/add', element: <AddProduct/> },
       { path: '/orders', element: <Orders /> },
       { path: '/order/:id', element: <Order /> },
-      { path: '/posts', element: <Posts /> },
       { path: '/notes', element: <Notes /> },
       { path: '/charts', element: <Charts /> },
       { path: '/logs', element: <Logs /> },

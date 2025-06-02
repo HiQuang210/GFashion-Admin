@@ -18,7 +18,6 @@ const Orders = () => {
       headerName: 'ID', 
       width: 80,
       renderCell: (params) => {
-        // Display incremental index starting from 1
         const rowIndex = params.api.getRowIndexRelativeToVisibleRows(params.id);
         return typeof rowIndex === 'number' && !isNaN(rowIndex) ? rowIndex + 1 : '-';
       }
@@ -49,7 +48,6 @@ const Orders = () => {
       minWidth: 140,
       flex: 1,
       valueGetter: (params) => {
-        // Format the date
         const date = new Date(params.row.createdAt);
         return date.toLocaleDateString('en-US', {
           year: 'numeric',
@@ -64,7 +62,6 @@ const Orders = () => {
       minWidth: 150,
       flex: 1,
       valueGetter: (params) => {
-        // Format the total as currency (assuming VND based on the 20000/50000 shipping fees)
         return new Intl.NumberFormat('vi-VN', {
           style: 'currency',
           currency: 'VND'
@@ -77,36 +74,62 @@ const Orders = () => {
       minWidth: 120,
       flex: 1,
       renderCell: (params) => {
-        const status = params.row.status;
-        const statusConfig = {
-          pending: { color: 'warning', bgColor: 'bg-warning' },
-          Pending: { color: 'warning', bgColor: 'bg-warning' },
-          dispatch: { color: 'info', bgColor: 'bg-info' },
-          Dispatch: { color: 'info', bgColor: 'bg-info' },
-          cancelled: { color: 'error', bgColor: 'bg-error' },
-          Cancelled: { color: 'error', bgColor: 'bg-error' },
-          completed: { color: 'success', bgColor: 'bg-success' },
-          Completed: { color: 'success', bgColor: 'bg-success' },
+        const status = params.row.status?.toLowerCase() || 'unknown';
+        
+        const getStatusConfig = (status: string) => {
+          switch (status) {
+            case 'pending':
+              return {
+                dotColor: 'bg-yellow-500',
+                textColor: 'text-warning-content',
+                bgColor: 'bg-warning/20',
+                label: 'Pending'
+              };
+            case 'processing':
+              return {
+                dotColor: 'bg-blue-500',
+                textColor: 'text-info-content',
+                bgColor: 'bg-info/20',
+                label: 'Processing'
+              };
+            case 'shipping':
+              return {
+                dotColor: 'bg-purple-500',
+                textColor: 'text-primary-content',
+                bgColor: 'bg-primary/20',
+                label: 'Shipping'
+              };
+            case 'completed':
+              return {
+                dotColor: 'bg-green-500',
+                textColor: 'text-success-content',
+                bgColor: 'bg-success/20',
+                label: 'Completed'
+              };
+            case 'cancelled':
+              return {
+                dotColor: 'bg-red-500',
+                textColor: 'text-error-content',
+                bgColor: 'bg-error/20',
+                label: 'Cancelled'
+              };
+            default:
+              return {
+                dotColor: 'bg-gray-500',
+                textColor: 'text-base-content',
+                bgColor: 'bg-base-200',
+                label: 'Unknown'
+              };
+          }
         };
 
-        const config = statusConfig[status as keyof typeof statusConfig];
+        const config = getStatusConfig(status);
         
-        if (config) {
-          return (
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${config.bgColor}`}></div>
-              <div className={`text-sm font-medium text-${config.color} capitalize`}>
-                {status}
-              </div>
-            </div>
-          );
-        }
-
         return (
-          <div className="flex items-center gap-2">
-            <div className="badge bg-neutral-content badge-xs"></div>
-            <span className="text-sm font-semibold text-neutral-content">
-              Unknown
+          <div className={`inline-flex items-center gap-2 px-2 py-1 rounded-full ${config.bgColor}`}>
+            <div className={`w-2 h-2 rounded-full ${config.dotColor}`}></div>
+            <span className={`text-xs font-medium ${config.textColor} capitalize`}>
+              {config.label}
             </span>
           </div>
         );

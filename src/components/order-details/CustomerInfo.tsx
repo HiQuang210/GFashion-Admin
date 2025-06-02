@@ -1,4 +1,4 @@
-import { AdminOrder } from '@type/Order';
+import { AdminOrder } from 'types/Order';
 import React from 'react';
 import { HiUser } from 'react-icons/hi2';
 

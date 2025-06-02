@@ -29,6 +29,7 @@ export interface AdminOrder {
   address: string;
   delivery: string;
   payment: string;
+  note: string;
   status: string;
   createdAt: string;
   products: OrderProduct[];
