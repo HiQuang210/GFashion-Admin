@@ -168,9 +168,9 @@ const Orders = () => {
             <h2 className="font-bold text-2xl xl:text-4xl mt-0 pt-0 text-base-content dark:text-neutral-200">
               Orders
             </h2>
-            {data && data.length > 0 && (
+            {data?.data?.length > 0 && (
               <span className="text-neutral dark:text-neutral-content font-medium text-base">
-                {data.length} Orders Found
+                {data.data.length} Orders Found
               </span>
             )}
           </div>
@@ -179,7 +179,7 @@ const Orders = () => {
         <DataTable
           slug="orders"
           columns={columns}
-          rows={isSuccess ? data || [] : []}
+          rows={isSuccess ? data?.data || [] : []}
           includeActionColumn={true}
           actionConfig={actionConfig}
         />

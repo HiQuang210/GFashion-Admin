@@ -237,25 +237,6 @@ export const fetchAdminProducts = async (params: FetchAdminProductsParams = {}) 
   }
 };
 
-// GET TOTAL PRODUCTS
-export const fetchTotalProducts = async () => {
-  try {
-    const response = await apiClient.get('/product/get-all-admin', {
-      params: {
-        limitItem: 1, 
-        page: 1,
-      },
-    });
-
-    const total = response.data?.totalItems ?? 0;
-    console.log('Total products:', total);
-    return total;
-  } catch (error) {
-    console.error('Failed to fetch total products:', error);
-    throw error;
-  }
-};
-
 // CREATE PRODUCT
 export const createProduct = async (productData: Partial<Product>) => {
   try {
@@ -392,9 +373,9 @@ export const fetchOrders = async () => {
   try {
     const response = await apiClient.get('/order/admin-get-all');
     console.log('fetchOrders response:', response.data);
-    
+
     if (response.data.status === 'OK') {
-      return response.data.data; 
+      return response.data; 
     } else {
       throw new Error(response.data.message || 'Failed to fetch orders');
     }

@@ -1,217 +1,102 @@
-import {
-  MdGroup,
-  MdInventory2,
-  MdAssessment,
-  MdSwapHorizontalCircle,
-} from 'react-icons/md';
+export interface ChartDataPoint {
+  name: string;
+  value: number;
+}
 
-export const totalUsers = {
-  color: '#8884d8',
-  IconBox: MdGroup,
-  title: 'Total Users',
-  number: '11.238',
-  dataKey: 'users',
-  percentage: 45,
-  chartData: [
-    { name: 'Sun', users: 400 },
-    { name: 'Mon', users: 600 },
-    { name: 'Tue', users: 500 },
-    { name: 'Wed', users: 700 },
-    { name: 'Thu', users: 400 },
-    { name: 'Fri', users: 500 },
-    { name: 'Sat', users: 450 },
-  ],
-};
+export interface PieChartDataPoint {
+  name: string;
+  value: number;
+  color: string;
+}
 
-export const totalProducts = {
-  color: 'skyblue',
-  IconBox: MdInventory2,
-  title: 'Total Products',
-  number: '238',
-  dataKey: 'products',
-  percentage: 21,
-  chartData: [
-    { name: 'Sun', products: 400 },
-    { name: 'Mon', products: 600 },
-    { name: 'Tue', products: 500 },
-    { name: 'Wed', products: 700 },
-    { name: 'Thu', products: 400 },
-    { name: 'Fri', products: 500 },
-    { name: 'Sat', products: 450 },
-  ],
-};
-export const totalRevenue = {
-  color: 'teal',
-  IconBox: MdAssessment,
-  title: 'Total Revenue',
-  number: '$56.432',
-  dataKey: 'revenue',
-  percentage: -12,
-  chartData: [
-    { name: 'Sun', revenue: 400 },
-    { name: 'Mon', revenue: 600 },
-    { name: 'Tue', revenue: 500 },
-    { name: 'Wed', revenue: 700 },
-    { name: 'Thu', revenue: 400 },
-    { name: 'Fri', revenue: 500 },
-    { name: 'Sat', revenue: 450 },
-  ],
-};
-export const totalRatio = {
-  color: 'gold',
-  IconBox: MdSwapHorizontalCircle,
-  title: 'Total Ratio',
-  number: '2.6',
-  dataKey: 'ratio',
-  percentage: 12,
-  chartData: [
-    { name: 'Sun', ratio: 400 },
-    { name: 'Mon', ratio: 600 },
-    { name: 'Tue', ratio: 500 },
-    { name: 'Wed', ratio: 700 },
-    { name: 'Thu', ratio: 400 },
-    { name: 'Fri', ratio: 500 },
-    { name: 'Sat', ratio: 450 },
-  ],
-};
+export interface AreaChartDataPoint {
+  name: string;
+  smartphones: number;
+  consoles: number;
+  laptops: number;
+  others: number;
+}
 
-export const totalVisit = {
-  title: 'Total Visit',
-  color: '#FF8042',
-  dataKey: 'visit',
-  chartData: [
-    {
-      name: 'Sun',
-      visit: 4000,
-    },
-    {
-      name: 'Mon',
-      visit: 3000,
-    },
-    {
-      name: 'Tue',
-      visit: 2000,
-    },
-    {
-      name: 'Wed',
-      visit: 2780,
-    },
-    {
-      name: 'Thu',
-      visit: 1890,
-    },
-    {
-      name: 'Fri',
-      visit: 2390,
-    },
-    {
-      name: 'Sat',
-      visit: 3490,
-    },
-  ],
+// Sample data for Users line chart
+export const usersChartData: ChartDataPoint[] = [
+  { name: 'Jan', value: 4 },
+  { name: 'Feb', value: 5 },
+  { name: 'Mar', value: 7 },
+  { name: 'Apr', value: 6 },
+  { name: 'May', value: 4 },
+  { name: 'Jun', value: 8 },
+];
+
+// Sample data for Products line chart
+export const productsChartData: ChartDataPoint[] = [
+  { name: 'Jan', value: 5 },
+  { name: 'Feb', value: 7 },
+  { name: 'Mar', value: 4 },
+  { name: 'Apr', value: 6 },
+  { name: 'May', value: 9 },
+  { name: 'Jun', value: 12 },
+];
+
+// Sample data for Orders line chart
+export const ordersChartData: ChartDataPoint[] = [
+  { name: 'Jan', value: 4 },
+  { name: 'Feb', value: 3 },
+  { name: 'Mar', value: 2 },
+  { name: 'Apr', value: 6 },
+  { name: 'May', value: 8 },
+  { name: 'Jun', value: 10 },
+];
+
+// Sample data for Revenue line chart
+export const revenueChartData: ChartDataPoint[] = [
+  { name: 'Jan', value: 4200 },
+  { name: 'Feb', value: 5100 },
+  { name: 'Mar', value: 3800 },
+  { name: 'Apr', value: 6300 },
+  { name: 'May', value: 5900 },
+  { name: 'Jun', value: 7200 },
+];
+
+// Sample data for Leads by Source pie chart
+export const leadsSourceData: PieChartDataPoint[] = [
+  { name: 'Google Ads', value: 35, color: '#3b82f6' },
+  { name: 'Facebook', value: 28, color: '#10b981' },
+  { name: 'Instagram', value: 20, color: '#f59e0b' },
+  { name: 'Direct', value: 12, color: '#ef4444' },
+  { name: 'Others', value: 5, color: '#8b5cf6' },
+];
+
+// Sample data for Revenue by Products area chart
+export const revenueByProductsData: AreaChartDataPoint[] = [
+  { name: 'Jan', smartphones: 1200, consoles: 800, laptops: 600, others: 400 },
+  { name: 'Feb', smartphones: 1400, consoles: 900, laptops: 700, others: 500 },
+  { name: 'Mar', smartphones: 1100, consoles: 700, laptops: 550, others: 350 },
+  { name: 'Apr', smartphones: 1600, consoles: 1100, laptops: 800, others: 600 },
+  { name: 'May', smartphones: 1500, consoles: 1000, laptops: 750, others: 550 },
+  { name: 'Jun', smartphones: 1800, consoles: 1200, laptops: 900, others: 700 },
+];
+
+// Helper functions to calculate percentages
+export const calculatePercentageChange = (current: number, previous: number): number => {
+  if (previous === 0) return 0;
+  return Math.round(((current - previous) / previous) * 100);
 };
 
-export const totalProfit = {
-  title: 'Profit Earned',
-  color: '#8884d8',
-  dataKey: 'profit',
-  chartData: [
-    {
-      name: 'Sun',
-      profit: 4000,
-    },
-    {
-      name: 'Mon',
-      profit: 3000,
-    },
-    {
-      name: 'Tue',
-      profit: 2000,
-    },
-    {
-      name: 'Wed',
-      profit: 2780,
-    },
-    {
-      name: 'Thu',
-      profit: 1890,
-    },
-    {
-      name: 'Fri',
-      profit: 2390,
-    },
-    {
-      name: 'Sat',
-      profit: 3490,
-    },
-  ],
+// Mock previous period data for percentage calculations
+export const mockPreviousData = {
+  users: 4, // Previous month users
+  products: 3, // Previous month products
+  orders: 5, // Previous month orders
+  revenue: 6800, // Previous month revenue
+  profit: 190, // Previous quarter profit
 };
 
-export const totalSource = {
-  title: 'Leads by Source',
-  // color: '#8884d8',
-  dataKey: 'value',
-  chartPieData: [
-    { name: 'Mobile', value: 350, color: '#0088FE' },
-    { name: 'Desktop', value: 250, color: '#00C49F' },
-    { name: 'Laptop', value: 325, color: '#FFBB28' },
-    { name: 'Tablet', value: 75, color: '#FF8042' },
-  ],
-};
-
-export const totalRevenueByProducts = {
-  title: 'Revenue by Products',
-  // color: '#8884d8',
-  dataKey: 'name',
-  chartAreaData: [
-    {
-      name: 'Sun',
-      smartphones: 4000,
-      consoles: 2400,
-      laptops: 2400,
-      others: 1000,
-    },
-    {
-      name: 'Mon',
-      smartphones: 3000,
-      consoles: 1398,
-      laptops: 2210,
-      others: 700,
-    },
-    {
-      name: 'Tue',
-      smartphones: 2000,
-      consoles: 9800,
-      laptops: 2290,
-      others: 675,
-    },
-    {
-      name: 'Wed',
-      smartphones: 2780,
-      consoles: 3908,
-      laptops: 2000,
-      others: 685,
-    },
-    {
-      name: 'Thu',
-      smartphones: 1890,
-      consoles: 4800,
-      laptops: 2181,
-      others: 675,
-    },
-    {
-      name: 'Fri',
-      smartphones: 2390,
-      consoles: 3800,
-      laptops: 2500,
-      others: 650,
-    },
-    {
-      name: 'Sat',
-      smartphones: 3490,
-      consoles: 4300,
-      laptops: 2100,
-      others: 1075,
-    },
-  ],
+// Color palette for consistent theming
+export const chartColors = {
+  users: '#3b82f6',      // Blue
+  products: '#10b981',   // Green
+  revenue: '#f59e0b',    // Amber
+  profit: '#ef4444',     // Red
+  secondary: '#8b5cf6',  // Purple
+  tertiary: '#06b6d4',   // Cyan
 };

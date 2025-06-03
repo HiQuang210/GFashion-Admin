@@ -5,26 +5,37 @@ import {
   MdGroup,
   MdInventory2,
   MdSwapHorizontalCircle,
+  MdShoppingCart,
 } from 'react-icons/md';
 import {
-  fetchUsers, // Updated import
-  fetchTotalProducts,
-  fetchTotalProfit,
+  fetchUsers, 
+  fetchAdminProducts,
   fetchTotalRevenue,
   fetchTotalRevenueByProducts,
-  fetchTotalSource
+  fetchTotalSource,
+  fetchOrders
 } from '@api/ApiCollection';
+import {
+  usersChartData,
+  productsChartData,
+  revenueChartData,
+  leadsSourceData,
+  revenueByProductsData,
+  ordersChartData,
+  calculatePercentageChange,
+  mockPreviousData,
+  chartColors
+} from '@components/charts/data';
 
 const Home = () => {
-  // Updated query to use fetchUsers instead of fetchTotalUsers
   const queryGetUsers = useQuery({
     queryKey: ['users'],
     queryFn: fetchUsers,
   });
 
   const queryGetTotalProducts = useQuery({
-    queryKey: ['totalproducts'],
-    queryFn: fetchTotalProducts,
+    queryKey: ['products'],
+    queryFn: () => fetchAdminProducts(),
   });
 
   const queryGetTotalRevenue = useQuery({
@@ -42,9 +53,9 @@ const Home = () => {
     queryFn: fetchTotalRevenueByProducts,
   });
 
-  const queryGetTotalProfit = useQuery({
-    queryKey: ['totalprofit'],
-    queryFn: fetchTotalProfit,
+  const queryGetTotalOrders = useQuery({
+    queryKey: ['orders'],
+    queryFn: fetchOrders,
   });
 
   // Transform users data to match ChartBox expected format
@@ -53,33 +64,84 @@ const Home = () => {
       return {
         number: 0,
         percentage: 0,
-        chartData: []
+        chartData: usersChartData
       };
     }
 
     const responseData = queryGetUsers.data;
-    const users = responseData.data; // Access the nested data array
-    const totalUsers = responseData.totalUser; // Use the totalUser field from API
+    const totalUsers = responseData.totalUser;
 
-    // Create sample chart data based on user registration dates or other metrics
-    // You can modify this based on your actual data structure
-    const chartData = users.map((index: number) => ({
-      name: `User ${index + 1}`,
-      value: 1 // You can replace this with actual user metrics
-    }));
+    // Calculate percentage change using real data
+    const percentage = calculatePercentageChange(totalUsers, mockPreviousData.users);
 
-    // Calculate percentage growth (you can implement your own logic here)
-    // For example, comparing with previous period or target
-    const percentage = totalUsers > 0 ? 10 : 0; // Placeholder percentage
+    // Update the last data point with actual current users
+    const updatedChartData = [...usersChartData];
+    updatedChartData[updatedChartData.length - 1].value = totalUsers;
 
     return {
       number: totalUsers,
       percentage: percentage,
-      chartData: chartData
+      chartData: updatedChartData
     };
   };
 
+  // Transform products data to match ChartBox expected format
+  const transformProductsData = () => {
+    if (!queryGetTotalProducts.data) {
+      return {
+        number: 0,
+        percentage: 0,
+        chartData: productsChartData
+      };
+    }
+
+    const responseData = queryGetTotalProducts.data;
+    const totalProducts = responseData.totalProd;
+
+    // Calculate percentage change using real data
+    const percentage = calculatePercentageChange(totalProducts, mockPreviousData.products);
+
+    // Update the last data point with actual current products
+    const updatedChartData = [...productsChartData];
+    updatedChartData[updatedChartData.length - 1].value = totalProducts;
+
+    return {
+      number: totalProducts,
+      percentage: percentage,
+      chartData: updatedChartData,
+      dataKey: 'value'
+    };
+  };
+
+  // Transform orders data to match ChartBox expected format
+  const transformOrdersData = () => {
+    if (!queryGetTotalOrders.data) {
+      return {
+        number: 0,
+        percentage: 0,
+        chartData: ordersChartData
+      };
+    }
+
+    const responseData = queryGetTotalOrders.data;
+    const totalOrders = responseData.totalOrder;
+
+    const percentage = calculatePercentageChange(totalOrders, mockPreviousData.orders);
+
+    // Update the last data point with actual current orders
+    const updatedChartData = [...ordersChartData];
+    updatedChartData[updatedChartData.length - 1].value = totalOrders;
+
+    return {
+      number: totalOrders,
+      percentage: percentage,
+      chartData: updatedChartData
+    };
+  };
+  
   const usersData = transformUsersData();
+  const productsData = transformProductsData();
+  const ordersData = transformOrdersData();
 
   return (
     // screen
@@ -92,8 +154,10 @@ const Home = () => {
         <div className="box col-span-full sm:col-span-1 xl:col-span-1 3xl:row-span-2">
           <ChartBox
             chartType={'line'}
+            color={chartColors.users}
             IconBox={MdGroup}
             title="Total Users"
+            dataKey="value"
             number={usersData.number}
             percentage={usersData.percentage}
             chartData={usersData.chartData}
@@ -104,9 +168,13 @@ const Home = () => {
         <div className="box col-span-full sm:col-span-1 xl:col-span-1 3xl:row-span-2">
           <ChartBox
             chartType={'line'}
+            color={chartColors.products}
             IconBox={MdInventory2}
             title="Total Products"
-            {...queryGetTotalProducts.data}
+            dataKey={productsData.dataKey}
+            number={productsData.number}
+            percentage={productsData.percentage}
+            chartData={productsData.chartData}
             isLoading={queryGetTotalProducts.isLoading}
             isSuccess={queryGetTotalProducts.isSuccess}
           />
@@ -115,7 +183,7 @@ const Home = () => {
           <ChartBox
             chartType={'pie'}
             title="Leads by Source"
-            {...queryGetTotalSource.data}
+            chartPieData={leadsSourceData}
             isLoading={queryGetTotalSource.isLoading}
             isSuccess={queryGetTotalSource.isSuccess}
           />
@@ -123,29 +191,36 @@ const Home = () => {
         <div className="box col-span-full sm:col-span-1 xl:col-span-1 3xl:row-span-2">
           <ChartBox
             chartType={'line'}
-            IconBox={MdSwapHorizontalCircle}
-            title="Total Revenue"
-            {...queryGetTotalRevenue.data}
-            isLoading={queryGetTotalRevenue.isLoading}
-            isSuccess={queryGetTotalRevenue.isSuccess}
+            color={(chartColors as any).secondary || chartColors.users}
+            IconBox={MdShoppingCart}
+            title="Total Orders"
+            dataKey="value"
+            number={ordersData.number}
+            percentage={ordersData.percentage}
+            chartData={ordersData.chartData}
+            isLoading={queryGetTotalOrders.isLoading}
+            isSuccess={queryGetTotalOrders.isSuccess}
           />
         </div>
         <div className="box row-span-2 col-span-full xl:col-span-2 3xl:row-span-3">
           <ChartBox
             chartType={'area'}
             title="Revenue by Products"
-            {...queryGetTotalRevenueByProducts.data}
+            chartAreaData={revenueByProductsData}
             isLoading={queryGetTotalRevenueByProducts.isLoading}
             isSuccess={queryGetTotalRevenueByProducts.isSuccess}
           />
         </div>
         <div className="box col-span-full sm:col-span-1 xl:col-span-1 3xl:row-span-2">
           <ChartBox
-            chartType={'bar'}
-            title="Total Profit"
-            {...queryGetTotalProfit.data}
-            isLoading={queryGetTotalProfit.isLoading}
-            isSuccess={queryGetTotalProfit.isSuccess}
+            chartType={'line'}
+            color={chartColors.revenue}
+            IconBox={MdSwapHorizontalCircle}
+            title="Total Revenue"
+            dataKey="value"
+            chartData={revenueChartData}
+            isLoading={queryGetTotalRevenue.isLoading}
+            isSuccess={queryGetTotalRevenue.isSuccess}
           />
         </div>
       </div>
