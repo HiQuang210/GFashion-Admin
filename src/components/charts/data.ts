@@ -17,6 +17,12 @@ export interface AreaChartDataPoint {
   others: number;
 }
 
+export interface RevenueChartDataPoint {
+  name: string;
+  value: number;
+  month: number;
+}
+
 // Sample data for Users line chart
 export const usersChartData: ChartDataPoint[] = [
   { name: 'Jan', value: 4 },
@@ -47,7 +53,7 @@ export const ordersChartData: ChartDataPoint[] = [
   { name: 'Jun', value: 10 },
 ];
 
-// Sample data for Revenue line chart
+// Sample data for Revenue line chart (fallback)
 export const revenueChartData: ChartDataPoint[] = [
   { name: 'Jan', value: 4200 },
   { name: 'Feb', value: 5100 },
@@ -99,4 +105,70 @@ export const chartColors = {
   profit: '#ef4444',     // Red
   secondary: '#8b5cf6',  // Purple
   tertiary: '#06b6d4',   // Cyan
+};
+
+// ===== REVENUE INTEGRATION FUNCTIONS =====
+
+// Transform monthly revenue data to chart format
+export const transformRevenueDataToChart = (revenueData: any[]): RevenueChartDataPoint[] => {
+  const monthMapping: { [key: string]: number } = {
+    'January': 1, 'February': 2, 'March': 3, 'April': 4,
+    'May': 5, 'June': 6, 'July': 7, 'August': 8,
+    'September': 9, 'October': 10, 'November': 11, 'December': 12
+  };
+
+  return revenueData.map(item => ({
+    name: item.month.substring(0, 3), // "Jan", "Feb", etc.
+    value: Math.round(item.revenue * 100) / 100, // Round to 2 decimal places
+    month: monthMapping[item.month] || 0
+  })).sort((a, b) => a.month - b.month);
+};
+
+// Calculate revenue percentage change
+export const calculateRevenuePercentageChange = (currentData: any[], previousYearTotal?: number): number => {
+  const currentTotal = currentData.reduce((sum, item) => sum + item.revenue, 0);
+  
+  if (!previousYearTotal || previousYearTotal === 0) {
+    return currentTotal > 0 ? 100 : 0; // If no previous data, show 100% growth if current > 0
+  }
+  
+  return Math.round(((currentTotal - previousYearTotal) / previousYearTotal) * 100);
+};
+
+// Format revenue for display
+export const formatRevenue = (amount: number): string => {
+  if (amount >= 1000) {
+    return `${(amount / 1000).toFixed(1)}B VND`; // Billions
+  } else if (amount >= 1) {
+    return `${amount.toFixed(1)}M VND`; // Millions
+  } else {
+    return `${(amount * 1000).toFixed(0)}K VND`; // Thousands
+  }
+};
+
+// Mock previous year data for percentage calculation (2.5 billion VND in millions)
+export const mockPreviousRevenueTotal = 2500;
+
+// Format currency for Vietnamese Dong
+export const formatVND = (amount: number): string => {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(amount);
+};
+
+// Get current month name
+export const getCurrentMonth = (): string => {
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  return months[new Date().getMonth()];
+};
+
+// Get current year
+export const getCurrentYear = (): string => {
+  return new Date().getFullYear().toString();
 };

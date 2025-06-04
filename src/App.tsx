@@ -26,6 +26,8 @@ import Settings from './pages/Setting';
 import ProtectedRoute from './components/ProtectedRoute';
 import AddProduct from './pages/AddProduct';
 import Order from './pages/Order';
+import ForgotPassword from '@pages/ForgotPassword';
+import ResetPassword from '@pages/ResetPassword';
 
 function App() {
   const Layout = () => {
@@ -77,6 +79,14 @@ function App() {
     {
       path: '/login',
       element: <Login />,
+    },
+    {
+      path: '/forgot-password',
+      element: <ForgotPassword />,
+    },
+    {
+      path: '/reset-password',
+      element: <ResetPassword />,
     },
   ]);
 

@@ -216,6 +216,27 @@ export const changePassword = (
     .then((res) => res.data);
 };
 
+// REQUEST PASSWORD RESET
+export const requestPasswordReset = (email: string) => {
+  return axios
+    .post(`${API_BASE_URL}/user/request-password-reset`, { email })
+    .then((res) => res.data);
+};
+
+// VERIFY RESET CODE
+export const verifyResetCode = (email: string, code: string) => {
+  return axios
+    .post(`${API_BASE_URL}/user/verify-reset-code`, { email, code })
+    .then((res) => res.data);
+};
+
+// RESET PASSWORD
+export const resetPassword = (email: string, code: string, newPassword: string) => {
+  return axios
+    .post(`${API_BASE_URL}/user/reset-password`, { email, code, newPassword })
+    .then((res) => res.data);
+};
+
 // GET ALL PRODUCTS FOR ADMIN
 export const fetchAdminProducts = async (params: FetchAdminProductsParams = {}) => {
   try {
@@ -419,42 +440,57 @@ export const updateOrderStatus = async (orderId: string, status: string): Promis
   }
 };
 
-// GET TOTAL REVENUE
-export const fetchTotalRevenue = async () => {
-  const response = await axios
-    .get('https://react-admin-ui-v1-api.vercel.app/totalrevenue')
-    .then((res) => {
-      console.log('axios get:', res.data);
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-      throw err;
+// GET TOTAL REVENUE STATS 
+export const fetchTotalRevenueStats = async (year?: string) => {
+  try {
+    const response = await apiClient.get(`/report/revenue-stats${year ? `?year=${year}` : ''}`);
+    console.log('fetchTotalRevenueStats response:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('fetchTotalRevenueStats error:', error);
+    throw error;
+  }
+};
+
+// GET MONTHLY REVENUE DATA 
+export const fetchMonthlyRevenue = async (year?: string) => {
+  try {
+    const response = await apiClient.get(`/report/revenue${year ? `?year=${year}` : ''}`);
+    console.log('fetchMonthlyRevenue response:', response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('fetchMonthlyRevenue error:', error);
+    throw error;
+  }
+};
+
+// EXPORT REVENUE REPORT
+export const exportRevenueReport = async (year?: string) => {
+  try {
+    const response = await apiClient.get(`/report/exportRevenue${year ? `?year=${year}` : ''}`, {
+      responseType: 'blob'
     });
 
-  return response;
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `revenue-${year || '2025'}.xlsx`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+    
+    return response;
+  } catch (error: any) {
+    console.error('exportRevenueReport error:', error);
+    throw error;
+  }
 };
 
 // GET TOTAL SOURCE
 export const fetchTotalSource = async () => {
   const response = await axios
     .get('https://react-admin-ui-v1-api.vercel.app/totalsource')
-    .then((res) => {
-      console.log('axios get:', res.data);
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-      throw err;
-    });
-
-  return response;
-};
-
-// GET TOP DEALS
-export const fetchTopDeals = async () => {
-  const response = await axios
-    .get('https://react-admin-ui-v1-api.vercel.app/topdeals')
     .then((res) => {
       console.log('axios get:', res.data);
       return res.data;

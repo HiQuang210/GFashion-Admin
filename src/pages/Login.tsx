@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import ChangeThemes from '@components/ChangesThemes';
 import { DiReact } from 'react-icons/di';
-import { useNavigate } from 'react-router-dom';
+import { PiEyeBold, PiEyeClosedBold } from 'react-icons/pi';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { adminLoginUser } from '@api/ApiCollection';
 import { setCookie } from '@utils/cookieUtils';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -14,6 +17,8 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(location.state?.successMessage || '');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -22,6 +27,7 @@ const Login = () => {
       [name]: value
     }));
     if (error) setError('');
+    if (successMessage) setSuccessMessage('');
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -96,6 +102,12 @@ const Login = () => {
               </div>
             )}
 
+            {successMessage && (
+              <div className="alert alert-success">
+                <span className="text-sm">{successMessage}</span>
+              </div>
+            )}
+
             <label className="input input-bordered min-w-full flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -132,7 +144,7 @@ const Login = () => {
                 />
               </svg>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
@@ -141,6 +153,19 @@ const Login = () => {
                 required
                 disabled={isLoading}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="btn btn-ghost btn-sm p-0 h-auto min-h-0 hover:bg-transparent"
+                disabled={isLoading}
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <PiEyeClosedBold className="w-4 h-4 opacity-70 hover:opacity-100 transition-opacity" />
+                ) : (
+                  <PiEyeBold className="w-4 h-4 opacity-70 hover:opacity-100 transition-opacity" />
+                )}
+              </button>
             </label>
 
             <div className="flex items-center justify-between">
@@ -156,12 +181,14 @@ const Login = () => {
                   <span className="label-text text-xs">Remember me</span>
                 </label>
               </div>
-              {/* <a
-                href="#"
-                className="link link-primary font-semibold text-xs no-underline"
+              <button
+                type="button"
+                onClick={() => navigate('/forgot-password')}
+                className="link link-primary font-semibold text-xs no-underline hover:underline"
+                disabled={isLoading}
               >
                 Forgot Password?
-              </a> */}
+              </button>
             </div>
 
             <button

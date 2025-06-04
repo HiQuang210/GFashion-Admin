@@ -102,6 +102,13 @@ const User = () => {
 
   const isFormValid = Object.values(formData).every(Boolean) && emailRegex.test(formData.email);
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(amount || 0);
+  };
+
   return (
     <div className="w-full p-4">
       <div className="flex justify-between mb-4">
@@ -162,6 +169,14 @@ const User = () => {
                 <option value="true">Active</option>
                 <option value="false">Inactive</option>
               </select>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Total Spent</label>
+              <div className="input input-bordered w-full flex items-center bg-base-200 cursor-not-allowed">
+                <span className="text-base-content font-medium">
+                  {formatCurrency(user?.totalSpent || 0)}
+                </span>
+              </div>
             </div>
           </div>
 

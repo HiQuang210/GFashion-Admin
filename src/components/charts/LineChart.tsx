@@ -6,6 +6,8 @@ import {
   Line,
   Tooltip,
   ResponsiveContainer,
+  XAxis,
+  YAxis,
 } from 'recharts';
 import { BaseChartProps, ChartDataPoint } from '@type/Chart';
 
@@ -16,6 +18,9 @@ interface LineChartProps extends BaseChartProps {
   number?: number | string;
   percentage?: number;
   chartData?: ChartDataPoint[];
+  showExportButton?: boolean;
+  onExportClick?: () => void;
+  isRevenue?: boolean;
 }
 
 const LineChart: React.FC<LineChartProps> = ({
@@ -26,6 +31,9 @@ const LineChart: React.FC<LineChartProps> = ({
   number,
   percentage,
   chartData,
+  showExportButton = false,
+  onExportClick,
+  isRevenue = false,
 }) => {
   const navigate = useNavigate();
 
@@ -40,10 +48,9 @@ const LineChart: React.FC<LineChartProps> = ({
     } else if (titleLower.includes('order')) {
       return '/orders';
     } else if (titleLower.includes('revenue')) {
-      return '/revenue'; // You might want to create this route
+      return '/revenue';
     }
     
-    // Default fallback - you can customize this
     return '/dashboard';
   };
 
@@ -56,8 +63,31 @@ const LineChart: React.FC<LineChartProps> = ({
     navigate(redirectPath);
   };
 
-  // Check if this is a revenue chart to conditionally show the View All button
-  const isRevenueChart = title?.toLowerCase().includes('revenue') || false;
+  const handleExportClick = () => {
+    if (onExportClick) {
+      onExportClick();
+    }
+  };
+
+  // Custom tooltip for revenue charts
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      const value = payload[0].value;
+      const formattedValue = isRevenue ? 
+        `${value.toFixed(1)}M VND` : 
+        value.toLocaleString();
+      
+      return (
+        <div 
+          className="bg-opacity-90 border-none text-white rounded-lg px-3 py-2 text-sm"
+          style={{ backgroundColor: color }}
+        >
+          <p className="font-medium">{`${label}: ${formattedValue}`}</p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="w-full h-full flex justify-between items-end xl:gap-5">
@@ -73,38 +103,52 @@ const LineChart: React.FC<LineChartProps> = ({
         <span className="font-bold text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl m-0 p-0">
           {number}
         </span>
-        {!isRevenueChart && (
+        <div className="flex gap-2">
           <button
             onClick={handleViewAllClick}
             className="px-0 py-0 min-h-0 max-h-5 btn btn-link font-medium text-base-content no-underline m-0 hover:text-primary transition-colors"
           >
-            View All
+            {isRevenue ? 'View Detail' : 'View All'}
           </button>
-        )}
+          {showExportButton && (
+            <button
+              onClick={handleExportClick}
+              className="px-2 py-1 min-h-0 max-h-7 btn btn-outline btn-sm font-medium text-xs hover:btn-primary transition-colors"
+            >
+              Export
+            </button>
+          )}
+        </div>
       </div>
       <div className="flex h-full grow flex-col justify-between items-end">
         <div className="w-full h-full xl:h-[60%]">
           <ResponsiveContainer width="99%" height="100%">
             <RechartsLineChart width={300} height={100} data={chartData}>
+              {isRevenue && (
+                <>
+                  <XAxis 
+                    dataKey="name" 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 10, fill: '#666' }}
+                  />
+                  <YAxis 
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 10, fill: '#666' }}
+                    tickFormatter={(value) => `${value}M`}
+                  />
+                </>
+              )}
               <Line
                 type="monotone"
                 dataKey={dataKey}
                 stroke={color}
                 strokeWidth={2}
                 dot={false}
+                activeDot={{ r: 4, fill: color }}
               />
-              <Tooltip
-                contentStyle={{
-                  background: color,
-                  border: 'none',
-                  color: 'white',
-                  borderRadius: '8px',
-                  paddingTop: '0px',
-                  paddingBottom: '0px',
-                }}
-                itemStyle={{ color: 'white' }}
-                labelStyle={{ display: 'none' }}
-              />
+              <Tooltip content={<CustomTooltip />} />
             </RechartsLineChart>
           </ResponsiveContainer>
         </div>
@@ -114,10 +158,10 @@ const LineChart: React.FC<LineChartProps> = ({
               percentage && percentage > 0 ? 'text-success' : 'text-error'
             } text-2xl xl:text-xl 2xl:text-3xl font-bold`}
           >
-            {percentage || ''}%
+            {percentage ? `${percentage > 0 ? '+' : ''}${percentage}` : '0'}%
           </span>
           <span className="font-medium xl:text-sm 2xl:text-base">
-            this month
+            this year
           </span>
         </div>
       </div>

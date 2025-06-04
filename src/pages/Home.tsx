@@ -10,11 +10,11 @@ import {
 import {
   fetchUsers, 
   fetchAdminProducts,
-  fetchTotalRevenue,
-  fetchTotalRevenueByProducts,
+  fetchTotalRevenueStats,
+  fetchMonthlyRevenue,
   fetchTotalSource,
-  fetchOrders
-} from '@api/ApiCollection';
+  fetchOrders,
+  fetchTotalRevenueByProducts} from '@api/ApiCollection';
 import {
   usersChartData,
   productsChartData,
@@ -24,10 +24,16 @@ import {
   ordersChartData,
   calculatePercentageChange,
   mockPreviousData,
-  chartColors
+  chartColors,
+  transformRevenueDataToChart,
+  calculateRevenuePercentageChange,
+  formatRevenue,
+  mockPreviousRevenueTotal
 } from '@components/charts/data';
 
 const Home = () => {
+  const currentYear = new Date().getFullYear().toString();
+
   const queryGetUsers = useQuery({
     queryKey: ['users'],
     queryFn: fetchUsers,
@@ -38,9 +44,14 @@ const Home = () => {
     queryFn: () => fetchAdminProducts(),
   });
 
-  const queryGetTotalRevenue = useQuery({
-    queryKey: ['totalrevenue'],
-    queryFn: fetchTotalRevenue,
+  const queryGetTotalRevenueStats = useQuery({
+    queryKey: ['revenue-stats', currentYear],
+    queryFn: () => fetchTotalRevenueStats(currentYear),
+  });
+
+  const queryGetMonthlyRevenue = useQuery({
+    queryKey: ['monthly-revenue', currentYear],
+    queryFn: () => fetchMonthlyRevenue(currentYear),
   });
 
   const queryGetTotalSource = useQuery({
@@ -138,10 +149,42 @@ const Home = () => {
       chartData: updatedChartData
     };
   };
+
+  // Transform revenue data using real API data
+  const transformRevenueData = () => {
+    if (!queryGetTotalRevenueStats.data?.data || !queryGetMonthlyRevenue.data?.data) {
+      return {
+        number: "0M VND",
+        percentage: 0,
+        chartData: revenueChartData
+      };
+    }
+
+    const revenueStats = queryGetTotalRevenueStats.data.data;
+    const monthlyData = queryGetMonthlyRevenue.data.data;
+
+    // Transform monthly data to chart format
+    const chartData = transformRevenueDataToChart(monthlyData);
+
+    // Calculate percentage change
+    const percentage = calculateRevenuePercentageChange(monthlyData, mockPreviousRevenueTotal);
+
+    // Format total revenue for display
+    const formattedRevenue = formatRevenue(revenueStats.totalRevenueInMillions);
+
+    return {
+      number: formattedRevenue,
+      percentage: percentage,
+      chartData: chartData
+    };
+  };
+
+  // Handle revenue export
   
   const usersData = transformUsersData();
   const productsData = transformProductsData();
   const ordersData = transformOrdersData();
+  const revenueData = transformRevenueData();
 
   return (
     // screen
@@ -218,9 +261,11 @@ const Home = () => {
             IconBox={MdSwapHorizontalCircle}
             title="Total Revenue"
             dataKey="value"
-            chartData={revenueChartData}
-            isLoading={queryGetTotalRevenue.isLoading}
-            isSuccess={queryGetTotalRevenue.isSuccess}
+            number={revenueData.number}
+            percentage={revenueData.percentage}
+            chartData={revenueData.chartData}
+            isLoading={queryGetTotalRevenueStats.isLoading || queryGetMonthlyRevenue.isLoading}
+            isSuccess={queryGetTotalRevenueStats.isSuccess && queryGetMonthlyRevenue.isSuccess}
           />
         </div>
       </div>
