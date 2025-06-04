@@ -23,6 +23,13 @@ export interface RevenueChartDataPoint {
   month: number;
 }
 
+export interface TopProductDataPoint {
+  name: string;
+  value: number;
+  color: string;
+  type: string;
+}
+
 // Sample data for Users line chart
 export const usersChartData: ChartDataPoint[] = [
   { name: 'Jan', value: 4 },
@@ -53,23 +60,13 @@ export const ordersChartData: ChartDataPoint[] = [
   { name: 'Jun', value: 10 },
 ];
 
-// Sample data for Revenue line chart (fallback)
-export const revenueChartData: ChartDataPoint[] = [
-  { name: 'Jan', value: 4200 },
-  { name: 'Feb', value: 5100 },
-  { name: 'Mar', value: 3800 },
-  { name: 'Apr', value: 6300 },
-  { name: 'May', value: 5900 },
-  { name: 'Jun', value: 7200 },
-];
-
-// Sample data for Leads by Source pie chart
-export const leadsSourceData: PieChartDataPoint[] = [
-  { name: 'Google Ads', value: 35, color: '#3b82f6' },
-  { name: 'Facebook', value: 28, color: '#10b981' },
-  { name: 'Instagram', value: 20, color: '#f59e0b' },
-  { name: 'Direct', value: 12, color: '#ef4444' },
-  { name: 'Others', value: 5, color: '#8b5cf6' },
+export const topProductColors = [
+  '#3b82f6', // Blue
+  '#10b981', // Green
+  '#f59e0b', // Amber
+  '#ef4444', // Red
+  '#8b5cf6', // Purple
+  '#06b6d4', // Cyan
 ];
 
 // Sample data for Revenue by Products area chart
@@ -107,9 +104,55 @@ export const chartColors = {
   tertiary: '#06b6d4',   // Cyan
 };
 
-// ===== REVENUE INTEGRATION FUNCTIONS =====
+export const transformProductsToPieChart = (products: any[]): TopProductDataPoint[] => {
+  if (!products || products.length === 0) {
+    return [];
+  }
 
-// Transform monthly revenue data to chart format
+  // Group products by type and sum their sold quantities
+  const typeGroups = products.reduce((acc, product) => {
+    const type = product.type || 'Unknown';
+    if (!acc[type]) {
+      acc[type] = {
+        name: type,
+        totalSold: 0,
+        products: []
+      };
+    }
+    acc[type].totalSold += product.sold || 0;
+    acc[type].products.push(product);
+    return acc;
+  }, {});
+
+  // Convert to array and sort by total sold descending
+  const sortedTypes = Object.values(typeGroups)
+    .sort((a: any, b: any) => b.totalSold - a.totalSold)
+    .slice(0, 6); // Take top 6 types
+
+  // Transform to pie chart format with colors
+  return sortedTypes.map((typeGroup: any, index) => ({
+    name: typeGroup.name, // This will be the product type name (e.g., "Sweater", "Shoes")
+    value: typeGroup.totalSold, // Total sold for this type
+    color: topProductColors[index % topProductColors.length],
+    type: typeGroup.name // Keep type for reference
+  }));
+};
+
+// Calculate total products sold
+export const calculateTotalProductsSold = (products: any[]): number => {
+  if (!products || products.length === 0) return 0;
+  return products.reduce((total, product) => total + product.sold, 0);
+};
+
+// Get top product by sales
+export const getTopSellingProduct = (products: any[]): string => {
+  if (!products || products.length === 0) return 'No data';
+  const topProduct = products.reduce((prev, current) => 
+    (prev.sold > current.sold) ? prev : current
+  );
+  return `${topProduct.name} (${topProduct.sold} sold)`;
+};
+
 export const transformRevenueDataToChart = (revenueData: any[]): RevenueChartDataPoint[] => {
   const monthMapping: { [key: string]: number } = {
     'January': 1, 'February': 2, 'March': 3, 'April': 4,
@@ -118,8 +161,8 @@ export const transformRevenueDataToChart = (revenueData: any[]): RevenueChartDat
   };
 
   return revenueData.map(item => ({
-    name: item.month.substring(0, 3), // "Jan", "Feb", etc.
-    value: Math.round(item.revenue * 100) / 100, // Round to 2 decimal places
+    name: item.month.substring(0, 3),
+    value: Math.round(item.revenue * 100) / 100,
     month: monthMapping[item.month] || 0
   })).sort((a, b) => a.month - b.month);
 };
@@ -147,9 +190,8 @@ export const formatRevenue = (amount: number): string => {
 };
 
 // Mock previous year data for percentage calculation (2.5 billion VND in millions)
-export const mockPreviousRevenueTotal = 2500;
+export const mockPreviousRevenueTotal = 2.5;
 
-// Format currency for Vietnamese Dong
 export const formatVND = (amount: number): string => {
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
@@ -159,7 +201,6 @@ export const formatVND = (amount: number): string => {
   }).format(amount);
 };
 
-// Get current month name
 export const getCurrentMonth = (): string => {
   const months = [
     "January", "February", "March", "April", "May", "June",
@@ -168,7 +209,6 @@ export const getCurrentMonth = (): string => {
   return months[new Date().getMonth()];
 };
 
-// Get current year
 export const getCurrentYear = (): string => {
   return new Date().getFullYear().toString();
 };

@@ -5,7 +5,7 @@ import {
   HiOutlineClipboardDocumentList,
   HiOutlineStar,
   HiOutlinePencilSquare,
-  HiOutlinePresentationChartBar,
+  HiOutlineChartBar
 } from 'react-icons/hi2';
 import { IoSettingsOutline } from 'react-icons/io5';
 
@@ -50,16 +50,16 @@ export const menu = [
     listItems: [
       {
         isLink: true,
-        url: '/notes',
-        icon: HiOutlinePencilSquare,
-        label: 'notes',
+        url: '/revenue',
+        icon: HiOutlineChartBar,
+        label: 'report',
       },
       {
         isLink: true,
-        url: '/charts',
-        icon: HiOutlinePresentationChartBar,
-        label: 'charts',
-      },
+        url: '/notes',
+        icon: HiOutlinePencilSquare,
+        label: 'notes',
+      }
     ],
   },
 ];

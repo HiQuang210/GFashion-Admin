@@ -1,5 +1,6 @@
 import TopSpendingBox from '@components/dashboard/TopSpendingBox';
 import ChartBox from '@components/charts/ChartBox';
+import BestSellerBox from '@components/BestSellerBox'; 
 import { useQuery } from '@tanstack/react-query';
 import {
   MdGroup,
@@ -12,15 +13,11 @@ import {
   fetchAdminProducts,
   fetchTotalRevenueStats,
   fetchMonthlyRevenue,
-  fetchTotalSource,
   fetchOrders,
-  fetchTotalRevenueByProducts} from '@api/ApiCollection';
+  fetchTopSellingProducts} from '@api/ApiCollection';
 import {
   usersChartData,
   productsChartData,
-  revenueChartData,
-  leadsSourceData,
-  revenueByProductsData,
   ordersChartData,
   calculatePercentageChange,
   mockPreviousData,
@@ -28,7 +25,8 @@ import {
   transformRevenueDataToChart,
   calculateRevenuePercentageChange,
   formatRevenue,
-  mockPreviousRevenueTotal
+  mockPreviousRevenueTotal,
+  transformProductsToPieChart
 } from '@components/charts/data';
 
 const Home = () => {
@@ -54,14 +52,9 @@ const Home = () => {
     queryFn: () => fetchMonthlyRevenue(currentYear),
   });
 
-  const queryGetTotalSource = useQuery({
-    queryKey: ['totalsource'],
-    queryFn: fetchTotalSource,
-  });
-
-  const queryGetTotalRevenueByProducts = useQuery({
-    queryKey: ['totalrevenue-by-products'],
-    queryFn: fetchTotalRevenueByProducts,
+  const queryGetTopProducts = useQuery({
+    queryKey: ['top-products'],
+    queryFn: fetchTopSellingProducts,
   });
 
   const queryGetTotalOrders = useQuery({
@@ -155,8 +148,7 @@ const Home = () => {
     if (!queryGetTotalRevenueStats.data?.data || !queryGetMonthlyRevenue.data?.data) {
       return {
         number: "0M VND",
-        percentage: 0,
-        chartData: revenueChartData
+        percentage: 0
       };
     }
 
@@ -179,12 +171,22 @@ const Home = () => {
     };
   };
 
-  // Handle revenue export
+  const transformTopProductsData = () => {
+    if (!queryGetTopProducts.data?.data?.products) {
+      return { pieData: [] };
+    }
+    
+    const products = queryGetTopProducts.data.data.products;
+    const pieData = transformProductsToPieChart(products);
+    
+    return { pieData };
+  };
   
   const usersData = transformUsersData();
   const productsData = transformProductsData();
   const ordersData = transformOrdersData();
   const revenueData = transformRevenueData();
+  const topProductsData = transformTopProductsData();
 
   return (
     // screen
@@ -225,10 +227,10 @@ const Home = () => {
         <div className="box row-span-3 col-span-full sm:col-span-1 xl:col-span-1 3xl:row-span-5">
           <ChartBox
             chartType={'pie'}
-            title="Leads by Source"
-            chartPieData={leadsSourceData}
-            isLoading={queryGetTotalSource.isLoading}
-            isSuccess={queryGetTotalSource.isSuccess}
+            title="Top Products Sold"
+            chartPieData={topProductsData.pieData}
+            isLoading={queryGetTopProducts.isLoading}
+            isSuccess={queryGetTopProducts.isSuccess}
           />
         </div>
         <div className="box col-span-full sm:col-span-1 xl:col-span-1 3xl:row-span-2">
@@ -245,15 +247,6 @@ const Home = () => {
             isSuccess={queryGetTotalOrders.isSuccess}
           />
         </div>
-        <div className="box row-span-2 col-span-full xl:col-span-2 3xl:row-span-3">
-          <ChartBox
-            chartType={'area'}
-            title="Revenue by Products"
-            chartAreaData={revenueByProductsData}
-            isLoading={queryGetTotalRevenueByProducts.isLoading}
-            isSuccess={queryGetTotalRevenueByProducts.isSuccess}
-          />
-        </div>
         <div className="box col-span-full sm:col-span-1 xl:col-span-1 3xl:row-span-2">
           <ChartBox
             chartType={'line'}
@@ -266,6 +259,15 @@ const Home = () => {
             chartData={revenueData.chartData}
             isLoading={queryGetTotalRevenueStats.isLoading || queryGetMonthlyRevenue.isLoading}
             isSuccess={queryGetTotalRevenueStats.isSuccess && queryGetMonthlyRevenue.isSuccess}
+          />
+        </div>
+        {/* Add the BestSellerBox component in the empty section */}
+        <div className="box col-span-1 xl:col-span-2 row-span-1 3xl:row-span-2">
+          <BestSellerBox
+            topProductsData={topProductsData}
+            productsData={queryGetTopProducts.data?.data?.products}
+            isLoading={queryGetTopProducts.isLoading}
+            isSuccess={queryGetTopProducts.isSuccess}
           />
         </div>
       </div>

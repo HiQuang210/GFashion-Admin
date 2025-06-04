@@ -53,8 +53,7 @@ const AddProduct: React.FC = () => {
       toast.success('Product created successfully!', { id: 'productCreate' });
       queryClient.invalidateQueries({ queryKey: ['adminProducts'] });
       queryClient.invalidateQueries({ queryKey: ['totalProducts'] });
-      // Navigate to the created product's detail page
-      navigate(`/products/${data.data._id}`);
+      navigate(`/product/${data.data._id}`);
     },
     onError: (error: any) => {
       const errorMessage = error?.response?.data?.message || 'Failed to create product';

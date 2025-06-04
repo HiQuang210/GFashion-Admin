@@ -487,54 +487,25 @@ export const exportRevenueReport = async (year?: string) => {
   }
 };
 
-// GET TOTAL SOURCE
-export const fetchTotalSource = async () => {
-  const response = await axios
-    .get('https://react-admin-ui-v1-api.vercel.app/totalsource')
-    .then((res) => {
-      console.log('axios get:', res.data);
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-      throw err;
+// GET SOLDS BY PRODUCTS TYPE
+export const fetchTopSellingProducts = async () => {
+  try {
+    const response = await fetchAdminProducts({ 
+      limitItem: 50, 
+      page: 1,
+      sort: 'sold', 
     });
-
-  return response;
-};
-
-// GET TOTAL REVENUE BY PRODUCTS
-export const fetchTotalRevenueByProducts = async () => {
-  const response = await axios
-    .get(
-      'https://react-admin-ui-v1-api.vercel.app/totalrevenue-by-product'
-    )
-    .then((res) => {
-      console.log('axios get:', res.data);
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-      throw err;
-    });
-
-  return response;
-};
-
-// GET TOTAL PROFIT
-export const fetchTotalProfit = async () => {
-  const response = await axios
-    .get('https://react-admin-ui-v1-api.vercel.app/totalprofit')
-    .then((res) => {
-      console.log('axios get:', res.data);
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-      throw err;
-    });
-
-  return response;
+    
+    // Return the response in the expected format
+    return {
+      data: {
+        products: response.data // Assuming response.data contains the products array
+      }
+    };
+  } catch (error) {
+    console.error('Fetch top selling products failed:', error);
+    throw error;
+  }
 };
 
 // GET ALL POSTS

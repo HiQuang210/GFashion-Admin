@@ -60,7 +60,7 @@ const TopSpendingBox = () => {
             <button
               onClick={() => handleUserClick(user._id)}
               key={user._id}
-              className="w-full flex items-center h-auto btn btn-ghost px-1 py-2 hover:bg-gray-100 transition-colors"
+              className="w-full flex items-center h-auto btn btn-ghost px-1 py-2 hover:bg-base-500 transition-colors"
             >
               <div className="flex gap-3 2xl:gap-4 items-center w-full">
                 <div className="flex flex-col items-center gap-1">
