@@ -4,7 +4,6 @@ import {
   HiOutlineCube,
   HiOutlineClipboardDocumentList,
   HiOutlineStar,
-  HiOutlinePencilSquare,
   HiOutlineChartBar
 } from 'react-icons/hi2';
 import { IoSettingsOutline } from 'react-icons/io5';
@@ -43,23 +42,12 @@ export const menu = [
         icon: HiOutlineStar,
         label: 'reviews',
       },
-    ],
-  },
-  {
-    catalog: 'analytics',
-    listItems: [
       {
         isLink: true,
         url: '/revenue',
         icon: HiOutlineChartBar,
         label: 'report',
       },
-      {
-        isLink: true,
-        url: '/notes',
-        icon: HiOutlinePencilSquare,
-        label: 'notes',
-      }
     ],
   },
 ];

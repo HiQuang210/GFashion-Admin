@@ -1,4 +1,3 @@
-// import React from 'react';
 import {
   createBrowserRouter,
   RouterProvider,
@@ -15,9 +14,7 @@ import Menu from './components/menu/Menu';
 import Error from './pages/Error';
 import Profile from './pages/Profile';
 import Orders from './pages/Orders';
-import Notes from './pages/Notes';
 import Charts from './pages/Charts';
-import Logs from './pages/Logs';
 import ToasterProvider from './components/ToasterProvider';
 import EditProfile from './pages/EditProfile';
 import User from './pages/User';
@@ -72,9 +69,7 @@ function App() {
       { path: '/orders', element: <Orders /> },
       { path: '/order/:id', element: <Order /> },
       { path: '/revenue', element: <Revenue /> },
-      { path: '/notes', element: <Notes /> },
       { path: '/charts', element: <Charts /> },
-      { path: '/logs', element: <Logs /> },
       ],
       errorElement: <Error />,
     },

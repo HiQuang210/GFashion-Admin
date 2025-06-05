@@ -117,7 +117,7 @@ const Navbar: React.FC = () => {
         {/* notification */}
         <button
           onClick={() =>
-            toast('No notif!')
+            toast('No notification!')
           }
           className="px-0 xl:px-auto btn btn-circle btn-ghost"
         >

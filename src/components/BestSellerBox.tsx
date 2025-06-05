@@ -18,8 +18,7 @@ const BestSellerBox: React.FC<BestSellerBoxProps> = ({ isLoading, isSuccess, pro
     if (!productsData || productsData.length === 0) {
       return null;
     }
-    
-    // Find the product with the highest sold count
+
     const bestSeller = productsData.reduce((prev: Product, current: Product) => {
       return (prev.sold > current.sold) ? prev : current;
     });
@@ -29,7 +28,6 @@ const BestSellerBox: React.FC<BestSellerBoxProps> = ({ isLoading, isSuccess, pro
 
   const bestSeller = getBestSellerProduct();
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="w-full h-full bg-base-200 rounded-lg p-4 flex items-center justify-center">
@@ -173,8 +171,7 @@ const BestSellerBox: React.FC<BestSellerBoxProps> = ({ isLoading, isSuccess, pro
           </div>
         </div>
       </div>
-
-      {/* View Details Button */}
+      
       <button 
         className="btn btn-primary btn-sm w-full mt-auto"
         onClick={() => navigate(`/product/${bestSeller._id}`)}
