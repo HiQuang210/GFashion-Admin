@@ -153,11 +153,6 @@ const Orders = () => {
         id: 'promiseOrders',
       });
     }
-    if (isSuccess) {
-      toast.success('Orders loaded successfully!', {
-        id: 'promiseOrders',
-      });
-    }
   }, [isError, isLoading, isSuccess]);
 
   return (

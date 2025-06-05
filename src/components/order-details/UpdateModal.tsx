@@ -172,7 +172,7 @@ const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
                   </h4>
                   <p className="text-sm text-base-content/70 mb-4">
                     {selectedStatus === 'completed' 
-                      ? 'This action will mark the order as successfully delivered and completed. This action cannot be easily undone.'
+                      ? 'This action will mark the order as successfully delivered and completed. This action cannot be undone.'
                       : 'This action will cancel the order. This may affect inventory and customer notifications.'
                     }
                   </p>

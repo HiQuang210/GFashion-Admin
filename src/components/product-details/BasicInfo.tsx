@@ -126,28 +126,16 @@ const ProductBasicInfo: React.FC<ProductBasicInfoProps> = ({
           )}
           
           <div className="grid grid-cols-2 gap-4">
-            {/* Rating */}
+            {/* Rating - Always display only, never editable */}
             <div>
               <label className="text-sm font-medium text-base-content/70 flex items-center gap-1">
                 <HiOutlineStar size={16} />
                 Rating
               </label>
-              {isEditing ? (
-                <input
-                  type="number"
-                  value={product.rating}
-                  onChange={(e) => handleNumberChange('rating', e.target.value)}
-                  className="input input-bordered w-full mt-1"
-                  placeholder="0.0"
-                  step="0.1"
-                  min="0"
-                  max="5"
-                />
-              ) : (
-                <p className="font-medium">{product.rating}/5</p>
-              )}
+              <p className="font-medium">{product.rating}/5</p>
             </div>
 
+            {/* Sold - Always display only */}
             <div>
               <label className="text-sm font-medium text-base-content/70 flex items-center gap-1">
                 <HiOutlineShoppingBag size={16} />

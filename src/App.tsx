@@ -26,6 +26,8 @@ import AddProduct from './pages/AddProduct';
 import Order from './pages/Order';
 import ForgotPassword from '@pages/ForgotPassword';
 import ResetPassword from '@pages/ResetPassword';
+import Reviews from '@pages/Reviews';
+import ReviewDetail from '@pages/Review';
 
 function App() {
   const Layout = () => {
@@ -67,6 +69,8 @@ function App() {
       { path: '/product/:id', element: <Product /> },
       { path: '/product/add', element: <AddProduct/> },
       { path: '/orders', element: <Orders /> },
+      { path: '/reviews', element: <Reviews /> },
+      { path: '/review/:id', element: <ReviewDetail /> },
       { path: '/order/:id', element: <Order /> },
       { path: '/revenue', element: <Revenue /> },
       { path: '/charts', element: <Charts /> },

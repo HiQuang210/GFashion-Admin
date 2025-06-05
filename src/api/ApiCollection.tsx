@@ -1,6 +1,8 @@
 import axios, { AxiosResponse, AxiosError } from 'axios';
 import { getCookie, deleteCookie } from '@utils/cookieUtils';
 import { CreateUserData, User } from '@type/User'; 
+import { CreateReviewData, Review } from '@type/Review';
+import { ReviewsResponse, FetchReviewsParams } from '@type/Review';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
@@ -218,22 +220,22 @@ export const changePassword = (
 
 // REQUEST PASSWORD RESET
 export const requestPasswordReset = (email: string) => {
-  return axios
-    .post(`${API_BASE_URL}/user/request-password-reset`, { email })
+  return apiClient
+    .post('/user/request-password-reset', { email })
     .then((res) => res.data);
 };
 
 // VERIFY RESET CODE
 export const verifyResetCode = (email: string, code: string) => {
-  return axios
-    .post(`${API_BASE_URL}/user/verify-reset-code`, { email, code })
+  return apiClient
+    .post('/user/verify-reset-code', { email, code })
     .then((res) => res.data);
 };
 
 // RESET PASSWORD
 export const resetPassword = (email: string, code: string, newPassword: string) => {
-  return axios
-    .post(`${API_BASE_URL}/user/reset-password`, { email, code, newPassword })
+  return apiClient
+    .post('/user/reset-password', { email, code, newPassword })
     .then((res) => res.data);
 };
 
@@ -269,7 +271,6 @@ export const createProduct = async (productData: Partial<Product>) => {
     if (productData.producer) formData.append('producer', productData.producer);
     if (productData.description) formData.append('description', productData.description);
     if (productData.material) formData.append('material', productData.material);
-    if (productData.rating !== undefined) formData.append('rating', productData.rating.toString());
 
     if (productData.variants) {
       formData.append('variants', JSON.stringify(productData.variants));
@@ -508,50 +509,105 @@ export const fetchTopSellingProducts = async () => {
   }
 };
 
-// GET ALL POSTS
-export const fetchPosts = async () => {
-  const response = await axios
-    .get('https://react-admin-ui-v1-api.vercel.app/posts')
-    .then((res) => {
-      console.log('axios get:', res.data);
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-      throw err;
+// GET ALL REVIEWS FOR ADMIN
+export const fetchAllReviews = async (params: FetchReviewsParams = {}): Promise<ReviewsResponse> => {
+  try {
+    const response = await apiClient.get('/review/admin/all', {
+      params: {
+        page: params.page || 1,
+        limitItem: params.limitItem || 10,
+        sort: params.sort || '-createdAt',
+        filter: params.filter || '',
+        searchQuery: params.searchQuery || '',
+      },
     });
 
-  return response;
+    console.log('Fetched all reviews:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch all reviews:', error);
+    throw error;
+  }
 };
 
-// GET ALL NOTES
-export const fetchNotes = async () => {
-  const response = await axios
-    .get(`https://react-admin-ui-v1-api.vercel.app/notes?q=`)
-    .then((res) => {
-      console.log('axios get:', res.data);
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-      throw err;
+// GET REVIEW BY ORDER ID
+export const fetchReviewByOrderId = async (orderId: string): Promise<{ status: string; message: string; data: Review }> => {
+  try {
+    const response = await apiClient.get(`/review/order/${orderId}`);
+    console.log('Fetched review by order ID:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch review by order ID:', error);
+    throw error;
+  }
+};
+
+// GET REVIEWS BY PRODUCT ID
+export const fetchProductReviews = async (productId: string): Promise<{ status: string; message: string; data: Review[] }> => {
+  try {
+    const response = await apiClient.get(`/review/product/${productId}`);
+    console.log('Fetched product reviews:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch product reviews:', error);
+    throw error;
+  }
+};
+
+// GET USER REVIEWS (requires authentication)
+export const fetchUserReviews = async (): Promise<{ status: string; message: string; data: Review[] }> => {
+  try {
+    const response = await apiClient.get('/review/user');
+    console.log('Fetched user reviews:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch user reviews:', error);
+    throw error;
+  }
+};
+
+// CREATE REVIEW (requires authentication)
+export const createReview = async (reviewData: CreateReviewData): Promise<{ status: string; message: string; data: Review }> => {
+  try {
+    const response = await apiClient.post('/review/create', reviewData, {
+      headers: { 'Content-Type': 'application/json' },
     });
 
-  return response;
+    console.log('Review created successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to create review:', error);
+    throw error;
+  }
 };
 
-// GET ALL LOGS
-export const fetchLogs = async () => {
-  const response = await axios
-    .get(`https://react-admin-ui-v1-api.vercel.app/logs`)
-    .then((res) => {
-      console.log('axios get:', res.data);
-      return res.data;
-    })
-    .catch((err) => {
-      console.log(err);
-      throw err;
+// UPDATE REVIEW 
+export const updateReview = async (
+  reviewId: string, 
+  reviewData: Partial<CreateReviewData>
+): Promise<{ status: string; message: string; data: Review }> => {
+  try {
+    const response = await apiClient.put(`/review/update/${reviewId}`, reviewData, {
+      headers: { 'Content-Type': 'application/json' },
     });
 
-  return response;
+    console.log('Review updated successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to update review:', error);
+    throw error;
+  }
 };
+
+// DELETE REVIEW (FOR ADMIN)
+export const deleteReview = async (reviewId: string): Promise<{ status: string; message: string }> => {
+  try {
+    const response = await apiClient.delete(`/review/delete/${reviewId}`);
+    console.log('Review deleted successfully:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to delete review:', error);
+    throw error;
+  }
+};
+

@@ -27,9 +27,6 @@ const Order = () => {
     if (isError) {
       toast.error('Error loading order details!', { id: 'orderDetail' });
     }
-    if (order) {
-      toast.success('Order details loaded!', { id: 'orderDetail' });
-    }
   }, [isError, isLoading, order]);
 
   if (isLoading) {

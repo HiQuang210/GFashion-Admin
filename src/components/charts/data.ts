@@ -69,16 +69,6 @@ export const topProductColors = [
   '#06b6d4', // Cyan
 ];
 
-// Sample data for Revenue by Products area chart
-export const revenueByProductsData: AreaChartDataPoint[] = [
-  { name: 'Jan', smartphones: 1200, consoles: 800, laptops: 600, others: 400 },
-  { name: 'Feb', smartphones: 1400, consoles: 900, laptops: 700, others: 500 },
-  { name: 'Mar', smartphones: 1100, consoles: 700, laptops: 550, others: 350 },
-  { name: 'Apr', smartphones: 1600, consoles: 1100, laptops: 800, others: 600 },
-  { name: 'May', smartphones: 1500, consoles: 1000, laptops: 750, others: 550 },
-  { name: 'Jun', smartphones: 1800, consoles: 1200, laptops: 900, others: 700 },
-];
-
 // Helper functions to calculate percentages
 export const calculatePercentageChange = (current: number, previous: number): number => {
   if (previous === 0) return 0;
@@ -109,7 +99,6 @@ export const transformProductsToPieChart = (products: any[]): TopProductDataPoin
     return [];
   }
 
-  // Group products by type and sum their sold quantities
   const typeGroups = products.reduce((acc, product) => {
     const type = product.type || 'Unknown';
     if (!acc[type]) {

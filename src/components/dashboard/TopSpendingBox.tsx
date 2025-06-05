@@ -13,7 +13,9 @@ const TopSpendingBox = () => {
   });
 
   const sortedUsers = data?.data
-    ? [...data.data].sort((a: User, b: User) => b.totalSpent - a.totalSpent)
+    ? [...data.data]
+        .sort((a: User, b: User) => b.totalSpent - a.totalSpent)
+        .slice(0, 5)
     : [];
 
   const handleUserClick = (userId: string) => {

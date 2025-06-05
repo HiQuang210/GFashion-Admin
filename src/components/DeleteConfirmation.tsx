@@ -28,7 +28,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  const defaultDescription = `Are you sure you want to delete "${itemName}"? This action cannot be undone.`;
+  const defaultDescription = `Are you sure you want to delete "${itemName}"?`;
 
   return (
     <dialog open className="modal modal-open">
