@@ -9,37 +9,65 @@ import {
   MdShoppingCart,
 } from 'react-icons/md';
 import {
-  fetchUsers, 
-  fetchAdminProducts,
+  fetchMonthlyUsers,
+  fetchUserStats,
+  fetchMonthlyProducts,
+  fetchProductStats,
   fetchTotalRevenueStats,
   fetchMonthlyRevenue,
-  fetchOrders,
-  fetchTopSellingProducts} from '@api/ApiCollection';
+  fetchMonthlyOrders,
+  fetchOrderStats,
+  fetchTopSellingProducts
+} from '@api/ApiCollection';
 import {
   usersChartData,
   productsChartData,
   ordersChartData,
-  calculatePercentageChange,
   mockPreviousData,
   chartColors,
   transformRevenueDataToChart,
   calculateRevenuePercentageChange,
   formatRevenue,
-  mockPreviousRevenueTotal,
-  transformProductsToPieChart
+  transformProductsToPieChart,
+  transformUsersDataToChart,
+  calculateUsersPercentageChange,
+  transformProductsDataToChart,
+  calculateProductsPercentageChange,
+  transformOrdersDataToChart,
+  calculateOrdersPercentageChange
 } from '@components/charts/data';
 
 const Home = () => {
   const currentYear = new Date().getFullYear().toString();
 
-  const queryGetUsers = useQuery({
-    queryKey: ['users'],
-    queryFn: fetchUsers,
+  const queryGetMonthlyUsers = useQuery({
+    queryKey: ['monthly-users', currentYear],
+    queryFn: () => fetchMonthlyUsers(currentYear),
   });
 
-  const queryGetTotalProducts = useQuery({
-    queryKey: ['products'],
-    queryFn: () => fetchAdminProducts(),
+  const queryGetUserStats = useQuery({
+    queryKey: ['user-stats', currentYear],
+    queryFn: () => fetchUserStats(currentYear),
+  });
+
+  const queryGetMonthlyProducts = useQuery({
+    queryKey: ['monthly-products', currentYear],
+    queryFn: () => fetchMonthlyProducts(currentYear),
+  });
+
+  const queryGetProductStats = useQuery({
+    queryKey: ['product-stats', currentYear],
+    queryFn: () => fetchProductStats(currentYear),
+  });
+
+  const queryGetMonthlyOrders = useQuery({
+    queryKey: ['monthly-orders', currentYear],
+    queryFn: () => fetchMonthlyOrders(currentYear),
+  });
+
+  const queryGetOrderStats = useQuery({
+    queryKey: ['order-stats', currentYear],
+    queryFn: () => fetchOrderStats(currentYear),
   });
 
   const queryGetTotalRevenueStats = useQuery({
@@ -57,14 +85,9 @@ const Home = () => {
     queryFn: fetchTopSellingProducts,
   });
 
-  const queryGetTotalOrders = useQuery({
-    queryKey: ['orders'],
-    queryFn: fetchOrders,
-  });
-
-  // Transform users data to match ChartBox expected format
+  // Transform users data using real API data
   const transformUsersData = () => {
-    if (!queryGetUsers.data || !queryGetUsers.data.data) {
+    if (!queryGetMonthlyUsers.data?.data || !queryGetUserStats.data?.data) {
       return {
         number: 0,
         percentage: 0,
@@ -72,54 +95,59 @@ const Home = () => {
       };
     }
 
-    const responseData = queryGetUsers.data;
-    const totalUsers = responseData.totalUser;
-
+    const monthlyData = queryGetMonthlyUsers.data.data;
+    const statsData = queryGetUserStats.data.data;
+    
+    // Transform monthly data to chart format
+    const chartData = transformUsersDataToChart(monthlyData);
+    
     // Calculate percentage change using real data
-    const percentage = calculatePercentageChange(totalUsers, mockPreviousData.users);
-
-    // Update the last data point with actual current users
-    const updatedChartData = [...usersChartData];
-    updatedChartData[updatedChartData.length - 1].value = totalUsers;
+    const percentage = calculateUsersPercentageChange(monthlyData, mockPreviousData.users);
+    
+    // Use total users from stats
+    const totalUsers = statsData.totalUsers;
 
     return {
       number: totalUsers,
       percentage: percentage,
-      chartData: updatedChartData
+      chartData: chartData
     };
   };
 
-  // Transform products data to match ChartBox expected format
+  // Transform products data using real API data
   const transformProductsData = () => {
-    if (!queryGetTotalProducts.data) {
+    if (!queryGetMonthlyProducts.data?.data || !queryGetProductStats.data?.data) {
       return {
         number: 0,
         percentage: 0,
-        chartData: productsChartData
+        chartData: productsChartData,
+        dataKey: 'value'
       };
     }
 
-    const responseData = queryGetTotalProducts.data;
-    const totalProducts = responseData.totalProd;
-
+    const monthlyData = queryGetMonthlyProducts.data.data;
+    const statsData = queryGetProductStats.data.data;
+    
+    // Transform monthly data to chart format
+    const chartData = transformProductsDataToChart(monthlyData);
+    
     // Calculate percentage change using real data
-    const percentage = calculatePercentageChange(totalProducts, mockPreviousData.products);
-
-    // Update the last data point with actual current products
-    const updatedChartData = [...productsChartData];
-    updatedChartData[updatedChartData.length - 1].value = totalProducts;
+    const percentage = calculateProductsPercentageChange(monthlyData, mockPreviousData.products);
+    
+    // Use total products from stats
+    const totalProducts = statsData.totalProducts;
 
     return {
       number: totalProducts,
       percentage: percentage,
-      chartData: updatedChartData,
+      chartData: chartData,
       dataKey: 'value'
     };
   };
 
-  // Transform orders data to match ChartBox expected format
+  // Transform orders data using real API data
   const transformOrdersData = () => {
-    if (!queryGetTotalOrders.data) {
+    if (!queryGetMonthlyOrders.data?.data || !queryGetOrderStats.data?.data) {
       return {
         number: 0,
         percentage: 0,
@@ -127,19 +155,22 @@ const Home = () => {
       };
     }
 
-    const responseData = queryGetTotalOrders.data;
-    const totalOrders = responseData.totalOrder;
-
-    const percentage = calculatePercentageChange(totalOrders, mockPreviousData.orders);
-
-    // Update the last data point with actual current orders
-    const updatedChartData = [...ordersChartData];
-    updatedChartData[updatedChartData.length - 1].value = totalOrders;
+    const monthlyData = queryGetMonthlyOrders.data.data;
+    const statsData = queryGetOrderStats.data.data;
+    
+    // Transform monthly data to chart format
+    const chartData = transformOrdersDataToChart(monthlyData);
+    
+    // Calculate percentage change using real data
+    const percentage = calculateOrdersPercentageChange(monthlyData, mockPreviousData.orders);
+    
+    // Use total orders from stats
+    const totalOrders = statsData.totalOrders;
 
     return {
       number: totalOrders,
       percentage: percentage,
-      chartData: updatedChartData
+      chartData: chartData
     };
   };
 
@@ -159,7 +190,7 @@ const Home = () => {
     const chartData = transformRevenueDataToChart(monthlyData);
 
     // Calculate percentage change
-    const percentage = calculateRevenuePercentageChange(monthlyData, mockPreviousRevenueTotal);
+    const percentage = calculateRevenuePercentageChange(monthlyData, mockPreviousData.revenue);
 
     // Format total revenue for display
     const formattedRevenue = formatRevenue(revenueStats.totalRevenueInMillions);
@@ -206,8 +237,8 @@ const Home = () => {
             number={usersData.number}
             percentage={usersData.percentage}
             chartData={usersData.chartData}
-            isLoading={queryGetUsers.isLoading}
-            isSuccess={queryGetUsers.isSuccess}
+            isLoading={queryGetMonthlyUsers.isLoading || queryGetUserStats.isLoading}
+            isSuccess={queryGetMonthlyUsers.isSuccess && queryGetUserStats.isSuccess}
           />
         </div>
         <div className="box col-span-full sm:col-span-1 xl:col-span-1 3xl:row-span-2">
@@ -220,8 +251,8 @@ const Home = () => {
             number={productsData.number}
             percentage={productsData.percentage}
             chartData={productsData.chartData}
-            isLoading={queryGetTotalProducts.isLoading}
-            isSuccess={queryGetTotalProducts.isSuccess}
+            isLoading={queryGetMonthlyProducts.isLoading || queryGetProductStats.isLoading}
+            isSuccess={queryGetMonthlyProducts.isSuccess && queryGetProductStats.isSuccess}
           />
         </div>
         <div className="box row-span-3 col-span-full sm:col-span-1 xl:col-span-1 3xl:row-span-5">
@@ -243,8 +274,8 @@ const Home = () => {
             number={ordersData.number}
             percentage={ordersData.percentage}
             chartData={ordersData.chartData}
-            isLoading={queryGetTotalOrders.isLoading}
-            isSuccess={queryGetTotalOrders.isSuccess}
+            isLoading={queryGetMonthlyOrders.isLoading || queryGetOrderStats.isLoading}
+            isSuccess={queryGetMonthlyOrders.isSuccess && queryGetOrderStats.isSuccess}
           />
         </div>
         <div className="box col-span-full sm:col-span-1 xl:col-span-1 3xl:row-span-2">
@@ -261,7 +292,6 @@ const Home = () => {
             isSuccess={queryGetTotalRevenueStats.isSuccess && queryGetMonthlyRevenue.isSuccess}
           />
         </div>
-        {/* Add the BestSellerBox component in the empty section */}
         <div className="box col-span-1 xl:col-span-2 row-span-1 3xl:row-span-2">
           <BestSellerBox
             topProductsData={topProductsData}

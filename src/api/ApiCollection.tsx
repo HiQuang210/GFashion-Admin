@@ -441,11 +441,109 @@ export const updateOrderStatus = async (orderId: string, status: string): Promis
   }
 };
 
+// GET MONTHLY USERS DATA 
+export const fetchMonthlyUsers = async (year?: string) => {
+  try {
+    const response = await apiClient.get(`/report/users${year ? `?year=${year}` : ''}`);
+    return response.data;
+  } catch (error: any) {
+    console.error('fetchMonthlyUsers error:', error);
+    throw error;
+  }
+};
+
+// GET USER STATISTICS
+export const fetchUserStats = async (year?: string) => {
+  try {
+    const response = await apiClient.get(`/report/user-stats${year ? `?year=${year}` : ''}`);
+    return response.data;
+  } catch (error: any) {
+    console.error('fetchUserStats error:', error);
+    throw error;
+  }
+};
+
+// GET TOTAL USERS (overall count)
+export const fetchTotalUsers = async () => {
+  try {
+    const response = await apiClient.get('/report/total-users');
+    return response.data;
+  } catch (error: any) {
+    console.error('fetchTotalUsers error:', error);
+    throw error;
+  }
+};
+
+// GET MONTHLY PRODUCTS DATA 
+export const fetchMonthlyProducts = async (year?: string) => {
+  try {
+    const response = await apiClient.get(`/report/products${year ? `?year=${year}` : ''}`);
+    return response.data;
+  } catch (error: any) {
+    console.error('fetchMonthlyProducts error:', error);
+    throw error;
+  }
+};
+
+// GET PRODUCT STATISTICS
+export const fetchProductStats = async (year?: string) => {
+  try {
+    const response = await apiClient.get(`/report/product-stats${year ? `?year=${year}` : ''}`);
+    return response.data;
+  } catch (error: any) {
+    console.error('fetchProductStats error:', error);
+    throw error;
+  }
+};
+
+// GET TOTAL PRODUCTS (overall count and analytics)
+export const fetchTotalProductsReport = async () => {
+  try {
+    const response = await apiClient.get('/report/total-products');
+    return response.data;
+  } catch (error: any) {
+    console.error('fetchTotalProductsReport error:', error);
+    throw error;
+  }
+};
+
+// GET MONTHLY ORDERS DATA 
+export const fetchMonthlyOrders = async (year?: string) => {
+  try {
+    const response = await apiClient.get(`/report/orders${year ? `?year=${year}` : ''}`);
+    return response.data;
+  } catch (error: any) {
+    console.error('fetchMonthlyOrders error:', error);
+    throw error;
+  }
+};
+
+// GET ORDER STATISTICS
+export const fetchOrderStats = async (year?: string) => {
+  try {
+    const response = await apiClient.get(`/report/order-stats${year ? `?year=${year}` : ''}`);
+    return response.data;
+  } catch (error: any) {
+    console.error('fetchOrderStats error:', error);
+    throw error;
+  }
+};
+
+// GET TOTAL ORDERS (overall count and analytics)
+export const fetchTotalOrdersReport = async () => {
+  try {
+    const response = await apiClient.get('/report/total-orders');
+    return response.data;
+  } catch (error: any) {
+    console.error('fetchTotalOrdersReport error:', error);
+    throw error;
+  }
+};
+
 // GET TOTAL REVENUE STATS 
 export const fetchTotalRevenueStats = async (year?: string) => {
   try {
     const response = await apiClient.get(`/report/revenue-stats${year ? `?year=${year}` : ''}`);
-    console.log('fetchTotalRevenueStats response:', response.data);
     return response.data;
   } catch (error: any) {
     console.error('fetchTotalRevenueStats error:', error);
@@ -457,7 +555,6 @@ export const fetchTotalRevenueStats = async (year?: string) => {
 export const fetchMonthlyRevenue = async (year?: string) => {
   try {
     const response = await apiClient.get(`/report/revenue${year ? `?year=${year}` : ''}`);
-    console.log('fetchMonthlyRevenue response:', response.data);
     return response.data;
   } catch (error: any) {
     console.error('fetchMonthlyRevenue error:', error);
@@ -496,11 +593,10 @@ export const fetchTopSellingProducts = async () => {
       page: 1,
       sort: 'sold', 
     });
-    
-    // Return the response in the expected format
+
     return {
       data: {
-        products: response.data // Assuming response.data contains the products array
+        products: response.data 
       }
     };
   } catch (error) {

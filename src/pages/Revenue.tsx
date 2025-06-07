@@ -21,7 +21,7 @@ import {
   transformRevenueDataToChart,
   calculateRevenuePercentageChange,
   formatRevenue,
-  mockPreviousRevenueTotal
+  mockPreviousData
 } from '@components/charts/data';
 
 const Revenue: React.FC = () => {
@@ -67,7 +67,7 @@ const Revenue: React.FC = () => {
 
     const chartData = transformRevenueDataToChart(monthlyData);
 
-    const percentage = calculateRevenuePercentageChange(monthlyData, mockPreviousRevenueTotal);
+    const percentage = calculateRevenuePercentageChange(monthlyData, mockPreviousData.revenue);
 
     const formattedRevenue = formatRevenue(revenueStats.totalRevenueInMillions);
 
@@ -94,9 +94,8 @@ const Revenue: React.FC = () => {
     return null;
   };
 
-  // Generate year options (current year and 4 years back)
   const currentYear = new Date().getFullYear();
-  const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear - i);
+  const yearOptions = Array.from({ length: 3 }, (_, i) => currentYear - i);
 
   return (
     <div className="w-full space-y-6">

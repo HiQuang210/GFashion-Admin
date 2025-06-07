@@ -145,15 +145,12 @@ const Orders = () => {
   };
 
   React.useEffect(() => {
-    if (isLoading) {
-      toast.loading('Loading orders...', { id: 'promiseOrders' });
-    }
     if (isError) {
       toast.error('Error while getting the orders!', {
         id: 'promiseOrders',
       });
     }
-  }, [isError, isLoading, isSuccess]);
+  }, [isError]);
 
   return (
     <div className="w-full p-0 m-0">

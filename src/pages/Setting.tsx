@@ -14,7 +14,7 @@ const Settings = () => {
           </h2>
         </div>
 
-        {/* Block: Account Settings */}
+        {/* Account Settings */}
         <div className="w-full flex flex-col items-stretch gap-6 xl:gap-7">
           <div className="flex flex-col gap-2">
             <div className="flex items-center w-full gap-3 xl:gap-5">

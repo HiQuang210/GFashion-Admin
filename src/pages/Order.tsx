@@ -21,13 +21,10 @@ const Order = () => {
   });
 
   React.useEffect(() => {
-    if (isLoading) {
-      toast.loading('Loading order details...', { id: 'orderDetail' });
-    }
     if (isError) {
       toast.error('Error loading order details!', { id: 'orderDetail' });
     }
-  }, [isError, isLoading, order]);
+  }, [isError, order]);
 
   if (isLoading) {
     return (

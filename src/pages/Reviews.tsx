@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { useDebounce } from 'use-debounce'; // You might need to install this: npm install use-debounce
+import { useDebounce } from 'use-debounce';
 import {
   MdStar,
   MdSearch,
@@ -11,9 +11,9 @@ import {
 } from 'react-icons/md';
 import { fetchAllReviews } from '@api/ApiCollection';
 import { Review } from '@type/Review';
+import { formatDate } from '@utils/reviewHelper';
 import { 
   renderStars, 
-  formatDate, 
   generatePagination, 
   UserAvatar 
 } from '@components/ReviewHandler';
@@ -44,10 +44,9 @@ const Reviews = () => {
       searchQuery: debouncedSearchQuery.trim(),
     }),
     placeholderData: (previousData) => previousData,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000, 
   });
 
-  // Memoized handlers to prevent unnecessary re-renders
   const handleSortChange = useCallback((newSort: string) => {
     setSortBy(newSort);
     setCurrentPage(1);
@@ -92,17 +91,24 @@ const Reviews = () => {
 
   const filterOptions = useMemo(() => [
     { value: '', label: 'All Ratings' },
+    { value: '1', label: '1+ Stars' },
+    { value: '2', label: '2+ Stars' },
+    { value: '3', label: '3+ Stars' },
+    { value: '4', label: '4+ Stars' },
     { value: '5', label: '5 Stars' },
-    { value: '4', label: '4 Stars' },
-    { value: '3', label: '3 Stars' },
-    { value: '2', label: '2 Stars' },
-    { value: '1', label: '1 Star' },
   ], []);
 
   // Check if any filters are active
   const hasActiveFilters = useMemo(() => {
     return searchQuery || filter || sortBy !== '-createdAt';
   }, [searchQuery, filter, sortBy]);
+
+  // Get filter display text
+  const getFilterDisplayText = useCallback((filterValue: string) => {
+    if (!filterValue) return '';
+    if (filterValue === '5') return '5 Stars';
+    return `${filterValue}+ Stars`;
+  }, []);
 
   if (isLoading) {
     return (
@@ -219,7 +225,7 @@ const Reviews = () => {
             )}
             {filter && (
               <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-sm rounded-full">
-                Rating: {filter} Star{filter !== '1' ? 's' : ''}
+                Rating: {getFilterDisplayText(filter)}
                 <button
                   onClick={() => handleFilterChange('')}
                   className="ml-1 hover:text-green-600 dark:hover:text-green-300"

@@ -1,6 +1,7 @@
 import React from 'react';
 import { MdEmail, MdShoppingBag, MdLocalShipping, MdTagFaces } from 'react-icons/md';
-import { renderStars, formatDetailedDate, formatPrice, UserAvatar } from '@components/ReviewHandler';
+import { renderStars, UserAvatar } from '@components/ReviewHandler';
+import { formatPrice, formatDetailedDate } from '@utils/reviewHelper';
 import { Review } from '@type/Review';
 import { ServiceRating } from './UIComponents';
 

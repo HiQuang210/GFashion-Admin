@@ -1,6 +1,7 @@
 import React from 'react';
 import { MdWarning, MdArrowBack, MdDelete } from 'react-icons/md';
-import { formatDetailedDate, renderStars } from '@components/ReviewHandler';
+import { renderStars } from '@components/ReviewHandler';
+import { formatDetailedDate } from '@utils/reviewHelper';
 
 // Loading Component
 export const LoadingSpinner: React.FC = () => (
@@ -54,7 +55,6 @@ export const ReviewNotFound: React.FC<ReviewNotFoundProps> = ({ onBackClick }) =
   </div>
 );
 
-// Header Component
 interface ReviewHeaderProps {
   onBackClick: () => void;
   onDeleteClick: () => void;
@@ -94,7 +94,6 @@ export const ReviewHeader: React.FC<ReviewHeaderProps> = ({
   </div>
 );
 
-// Service Rating Component
 interface ServiceRatingProps {
   icon: React.ComponentType<{ className?: string }>;
   label: string;

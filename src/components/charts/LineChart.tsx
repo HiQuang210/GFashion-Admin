@@ -37,7 +37,6 @@ const LineChart: React.FC<LineChartProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  // Function to determine the redirect path based on chart title
   const getRedirectPath = (chartTitle: string): string => {
     const titleLower = chartTitle.toLowerCase();
     
@@ -51,7 +50,7 @@ const LineChart: React.FC<LineChartProps> = ({
       return '/revenue';
     }
     
-    return '/dashboard';
+    return '/';
   };
 
   const handleViewAllClick = () => {
@@ -69,20 +68,23 @@ const LineChart: React.FC<LineChartProps> = ({
     }
   };
 
-  // Custom tooltip for revenue charts
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const value = payload[0].value;
       const formattedValue = isRevenue ? 
         `${value.toFixed(1)}M VND` : 
         value.toLocaleString();
+      let monthName = label;
+      if (chartData && payload[0] && payload[0].payload && payload[0].payload.name) {
+        monthName = payload[0].payload.name;
+      }
       
       return (
         <div 
           className="bg-opacity-90 border-none text-white rounded-lg px-3 py-2 text-sm"
           style={{ backgroundColor: color }}
         >
-          <p className="font-medium">{`${label}: ${formattedValue}`}</p>
+          <p className="font-medium">{`${monthName}: ${formattedValue}`}</p>
         </div>
       );
     }
