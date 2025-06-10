@@ -58,8 +58,8 @@ export const ordersChartData: ChartDataPoint[] = [
 ];
 
 export const mockPreviousData = {
-  users: 4,
-  products: 3,
+  users: 6,
+  products: 8,
   orders: 5,
   revenue: 5
 };

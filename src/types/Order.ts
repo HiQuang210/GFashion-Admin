@@ -27,6 +27,7 @@ export interface AdminOrder {
   userId: string;
   recipient: string; 
   address: string;
+  phone: string;
   delivery: string;
   payment: string;
   note: string;

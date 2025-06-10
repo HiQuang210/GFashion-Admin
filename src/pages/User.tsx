@@ -100,7 +100,12 @@ const User = () => {
     }
   };
 
-  const isFormValid = Object.values(formData).every(Boolean) && emailRegex.test(formData.email);
+  const isFormValid = 
+    formData.firstName && 
+    formData.lastName && 
+    formData.email && 
+    formData.phone && 
+    emailRegex.test(formData.email);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', {

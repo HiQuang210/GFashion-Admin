@@ -8,6 +8,11 @@ export interface User {
   isActive: boolean;
   isAdmin: boolean;
   phone?: string;
+  address: {         
+    recipient: string;
+    phone: string;
+    location: string;
+  }[];    
   favorite: string[]; 
   totalSpent: number;
   cart: {
