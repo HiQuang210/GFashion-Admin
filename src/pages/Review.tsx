@@ -53,7 +53,10 @@ const ReviewDetail = () => {
   if (isError) return <ErrorMessage error={error} />;
   if (!review) return <ReviewNotFound onBackClick={handleBackToReviews} />;
 
-  const reviewerName = `${review.userId.firstName} ${review.userId.lastName}`;
+  const user = review.userId;
+  const reviewerName = user 
+    ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Anonymous User'
+    : 'Anonymous User';
 
   return (
     <div className="w-full p-6 max-w-4xl mx-auto">

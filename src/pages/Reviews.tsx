@@ -251,57 +251,64 @@ const Reviews = () => {
 
       {/* Reviews List */}
       <div className="space-y-4">
-        {reviewsData?.data?.map((review: Review) => (
-          <div
-            key={review._id}
-            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-all hover:border-blue-300 dark:hover:border-blue-600"
-          >
-            <div className="flex items-center justify-between">
-              {/* Left - User Info */}
-              <div className="flex items-start gap-4 flex-1">
-                <UserAvatar userImg={review.userId.img} />
+        {reviewsData?.data?.map((review: Review) => {
+          // Add null checks for user data
+          const user = review.userId;
+          const userName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : 'Anonymous User';
+          const userImg = user?.img || null;
+          
+          return (
+            <div
+              key={review._id}
+              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-all hover:border-blue-300 dark:hover:border-blue-600"
+            >
+              <div className="flex items-center justify-between">
+                {/* Left - User Info */}
+                <div className="flex items-start gap-4 flex-1">
+                  <UserAvatar userImg={userImg} />
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-medium text-gray-900 dark:text-white">
-                      {review.userId.firstName} {review.userId.lastName}
-                    </h3>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">•</span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {formatDate(review.createdAt)}
-                    </span>
-                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-medium text-gray-900 dark:text-white">
+                        {userName}
+                      </h3>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">•</span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {formatDate(review.createdAt)}
+                      </span>
+                    </div>
 
-                  <div className="mb-2">
-                    {renderStars(review.overallRating)}
-                  </div>
+                    <div className="mb-2">
+                      {renderStars(review.overallRating)}
+                    </div>
 
-                  <p className="text-gray-700 dark:text-gray-300 text-sm line-clamp-2">
-                    {review.overallComment || 'No overall comment provided'}
-                  </p>
+                    <p className="text-gray-700 dark:text-gray-300 text-sm line-clamp-2">
+                      {review.overallComment || 'No overall comment provided'}
+                    </p>
 
-                  <div className="flex items-center gap-1 mt-2">
-                    <MdShoppingBag className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      Order to: {review.orderId.recipient}
-                    </span>
+                    <div className="flex items-center gap-1 mt-2">
+                      <MdShoppingBag className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        Order to: {review.orderId?.recipient || 'Unknown recipient'}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Right - View Detail */}
-              <div className="flex-shrink-0 ml-4">
-                <button
-                  onClick={() => handleViewDetail(review._id)}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium"
-                >
-                  <MdVisibility className="w-4 h-4" />
-                  View Detail
-                </button>
+                {/* Right - View Detail */}
+                <div className="flex-shrink-0 ml-4">
+                  <button
+                    onClick={() => handleViewDetail(review._id)}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium"
+                  >
+                    <MdVisibility className="w-4 h-4" />
+                    View Detail
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Empty State */}
