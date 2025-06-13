@@ -81,9 +81,9 @@ Before running this project, make sure you have:
 
 ### Development Mode
 ```bash
-npm run dev
+npm start
 # or
-yarn dev
+yarn start
 ```
 The application will start at `http://localhost:5173`
 
